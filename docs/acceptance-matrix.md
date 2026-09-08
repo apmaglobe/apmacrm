@@ -1,13 +1,13 @@
 # Qəbul meyarları — sübut matrisi
 
-08.09.2026. Bu matris AC-01–76-nın hər bəndinə mövcud sübutu və sınağın sərhədini bağlayır; bütün alt-ssenarilərə universal «keçdi» statusu vermir. Faktiki suite nəticələri [test-results](test-results.md)-dədir. DB: `scripts/test-db.ts`; browser: `tests/e2e`; unit: `tests/unit`; performans/restore: `scripts`. İstifadəçinin yeni göstərişi ilə xəritə və email sonraya saxlanıb.
+08.09.2026. Bu matris AC-01–76-nın hər bəndinə mövcud sübutu və sınağın sərhədini bağlayır; bütün alt-ssenarilərə universal «keçdi» statusu vermir. Faktiki suite nəticələri [test-results](test-results.md)-dədir. DB: `scripts/test-db.ts`; browser: `tests/e2e`; unit: `tests/unit`; performans/restore: `scripts`. İstifadəçinin yeni göstərişi ilə xəritə, email, real Excel və logo sonraya saxlanıb. Manual əməkdaş onboarding-i ayrıca razılaşdırılıb və 25–27 migration DB/browser testləri ilə yoxlanıb.
 
 | AC | İcra edilmiş sübut / tətbiq olunan sərhəd | Məhdudiyyət |
 |---|---|---|
 | AC-01 | DB tenant, export owner/foreign deny; browser iki tenant/12 route | Cross-tenant Realtime üçün ayrıca paket payload yoxlaması yoxdur. |
-| AC-02 | DB dəvət: uyğun təsdiqlənmiş email, retry, pending məlumatı bağlı | Email çatdırılması təxirə salınıb. |
+| AC-02 | DB dəvət: uyğun təsdiqlənmiş email, retry, pending məlumatı bağlı; manual provisioning40-cı DB testi və browser create/login | Email çatdırılması təxirə salınıb. |
 | AC-03 | Browser login/MFA; Auth origin konfiqurasiyası | SMTP təsdiq/reset çatdırılması istifadəçi tərəfindən təxirə salınıb. |
-| AC-04 | DB eskalasiya/profile payload/suspended; browser chat access ləğvi | Bütün membership channel dəyişmə variasiyaları ayrıca browser testi deyil. |
+| AC-04 | DB eskalasiya/profile payload/suspended; browser chat access ləğvi və nonadmin manual create403 | Bütün membership channel dəyişmə variasiyaları ayrıca browser testi deyil. |
 | AC-05 | DB commercial/finance sərhədi və export ləğvi; overview məbləğ RLS | Bütün rol kombinasiyalarının browser matrisinə iddia yoxdur. |
 | AC-06 | DB cursor/filter/object read; browser board/list və 12 route | Hər mümkün filtr kombinasiyası ayrıca test deyil. |
 | AC-07 | DB request retry; browser create | Paralel seriya üçün ayrıca stress assertion yoxdur. |
@@ -74,7 +74,7 @@
 | AC-68 | DB nonmember admin/removed deny; iki browser chat revocation | 15dəqiqə edit limitinin ayrıca sərhəd browser testi yoxdur. |
 | AC-69 | DB physical/digital capacity; browser broken unit/checkout/return | Qaytarılmamış vahid məşğuldur. |
 | AC-70 | DB artifact owner/foreign/field/revocation/expiry; browser download | CSV/XLSX bütün modul filtrləri ayrıca test deyil. |
-| AC-71 | DB pending/suspended/bootstrapAAL2/retry; browser TOTP | SMTP/email/reset çatdırılması təxirə salınıb. |
+| AC-71 | DB pending/suspended/bootstrapAAL2/retry; browser TOTP və manual əməkdaş create/login/tenant/retry/ikinci admin Realtime | SMTP/email/reset çatdırılması təxirə salınıb. |
 | AC-72 | Ayrı cloud→local DB/StorageSHA256/Vault/RLS/worker replay restore | Mac mövcudluğu və koordinator snapshot limitləri runbook-da. |
 | AC-73 | 12 route və əsas axınlar; productionbuild/preview | Production istifadəyə verilməyib; xəritə/email deferred, realExcel/logo yoxdur. |
 | AC-74 | DB future cap/reopen/redone monthly contribution | Overlap bütün müxtəlif müqavilə variasiyaları ayrıca browser testi deyil. |

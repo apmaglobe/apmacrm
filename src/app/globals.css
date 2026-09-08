@@ -77,9 +77,18 @@ button:disabled {
   color: #fff;
 }
 .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
-  padding: 8px;
+  height: 44px;
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0;
 }
+.icon-button > svg { width: 20px; height: 20px; stroke-width: 1.75; flex-shrink: 0; }
+button > svg, .button > svg { flex-shrink: 0; vertical-align: middle; }
+
 .brand {
   font-size: 23px;
   font-weight: 800;
@@ -114,6 +123,7 @@ button:disabled {
   background: transparent;
 }
 .top-actions {
+  align-items: center;
   margin-left: auto;
   display: flex;
   gap: 6px;
@@ -1028,30 +1038,34 @@ table select {
   max-width: 100%;
   height: auto;
 }
+:root[data-theme="dark"],
 .dark {
-  --bg: #162027;
-  --surface: #1d2a32;
-  --text: #e0e9e9;
-  --muted: #98a9ad;
-  --border: #2d3d43;
-  --soft: #203c36;
-  --accent: #56ac91;
+  --bg: #000;
+  --surface: #000;
+  --text: #f4f4f4;
+  --muted: #a3a3a3;
+  --border: #292929;
+  --soft: #08251e;
+  --accent: #61c9ab;
+  --danger: #fa8c82;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg);
-  min-height: 100vh;
 }
-.dark .column,
-.dark .segmented {
-  background: #19272e;
-}
-.dark input,
-.dark select,
-.dark textarea {
-  border-color: var(--border);
-}
-.dark .card-main strong {
-  color: #a0d1bb;
-}
+.dark { min-height: 100vh; }
+[data-theme="dark"] .column,
+[data-theme="dark"] .segmented { background: #000; border: 1px solid var(--border); }
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea { border-color: var(--border); }
+[data-theme="dark"] .card-main strong { color: #a0e0ca; }
+[data-theme="dark"] .auth { background: #000; }
+[data-theme="dark"] .count,
+[data-theme="dark"] .avatar { background: #131313; color: #c5c5c5; }
+[data-theme="dark"] .notice { border-color: #25463b; color: #bee9d9; }
+[data-theme="dark"] .notice.error { background: #270b09; border-color: #61241e; color: #ffaaa2; }
+[data-theme="dark"] .column-empty { border-color: var(--border); color: var(--muted); }
+[data-theme="dark"] .overlay { background: #000a; }
 .tenant-options {
   position: absolute;
   top: 100%;
@@ -1099,16 +1113,15 @@ table select {
     font-size: 21px;
   }
   .org-switch {
-    font-size: 11px;
-    padding: 5px;
-    max-width: 100px;
-    overflow: hidden;
+    display: none; /* Tenant choices remain available inside the mobile menu. */
   }
   .top-actions {
     gap: 0;
   }
   .top-actions .icon-button {
-    width: 38px;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
   }
   .top-actions > a {
     display: none;

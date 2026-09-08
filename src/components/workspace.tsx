@@ -1,4 +1,5 @@
 "use client";
+import {useTheme} from "./theme";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -53,12 +54,12 @@ function Frame({
   org: string;
   userId: string;
 }) {
+  const {dark,toggle:toggleTheme}=useTheme();
   const ready = useSyncExternalStore(subscribeReady, clientReady, serverReady);
   const path = usePathname(),
     router = useRouter(),
     cache = useQueryClient();
   const [open, setOpen] = useState(false),
-    [dark, setDark] = useState(false),
     [live, setLive] = useState(false);
   useEffect(() => {
     const db = browserClient();
@@ -116,13 +117,16 @@ function Frame({
           <button
             className="icon-button"
             aria-label="Temanı dəyiş"
-            onClick={() => setDark(!dark)}
+            disabled={!ready}
+            onClick={toggleTheme}
+            aria-pressed={dark}
           >
             {dark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
           <button
             className="icon-button"
             aria-label="Çıxış"
+            disabled={!ready}
             onClick={async () => {
               cache.clear();
               await browserClient().auth.signOut();

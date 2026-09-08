@@ -4,14 +4,14 @@ Bu təlimat qurulmuş kod üçündür. Bütün qəbul meyarlarının tamamlandı
 
 ## İlk adminin təhlükəsiz aktivləşdirilməsi
 
-Email konfiqurasiyası istifadəçinin göstərişi ilə təxirə salınıb. İlkin admini hesab sahibi yerli terminalda provision edə bilər:
+Email konfiqurasiyası istifadəçinin göstərişi ilə təxirə salınıb. **08.09.2026: apmaglobe@gmail.com Auth hesabı preview və production-da istifadəçinin seçdiyi parolla artıq yaradılıb; giriş yoxlanıb. Mövcud hesab üçün aşağıdakı provisioning scriptini yenidən işlətməyin; 2-ci addımdan başlayın.** TOTP və bootstrap istifadəçinin öz cihazında tamamlanır. Yeni/təmiz qurulum üçün:
 
 1. Bu repoda `pnpm exec tsx scripts/activate-admin.ts` işlədin. Script yalnız seçilmiş production ref-ə qoşulur, mövcud private cloud konfiqurasiyasını oxuyur. Parolu gizli terminal sorğusunda iki dəfə özünüz daxil edin; chat-a yazmayın. Script mövcud hesabın parolunu dəyişmir.
 2. Faktiki buraxılış URL-sində email/parol ilə daxil olun. Giriş səhifəsində TOTP autentifikatorunu qurun və 6 rəqəmli kodla təsdiqləyin.
 3. «İlk admini aktivləşdir» düyməsini seçin. Server təsdiqlənmiş email, AAL2 və əvvəlcədən yazılmış bootstrap allowlist tələb edir. Təkrar əməliyyat ikinci agentlik yaratmır.
 4. Şifrəni parol menecerinizdə, TOTP ehtiyatını ayrıca təhlükəsiz yerdə saxlayın. İkinci etibarlı admini istifadə etməyə başlayanda təyin edin. Son aktiv adminin dayandırılması DB tərəfindən bloklanır.
 
-Bu operator provisioning-i yalnız əvvəlcədən seçilmiş hesab sahibinə aiddir. Komanda üzvlərini təsadüfi confirm ilə açmayın. Email/SMTP hazır olduqda normal qeydiyyat, təsdiq və reset axınını canlıda ayrıca yoxlayın.
+Bu operator provisioning-i yalnız əvvəlcədən seçilmiş hesab sahibinə aiddir. İstifadəçinin son göstərişi manual komanda provisioning-inə də icazə verir. **Userlər → Əməkdaş əlavə et**: ad, email, minimum 10 simvolluq ilkin parol, rol və departamentlər; hesab dərhal active olur, email göndərilmir. Giriş məlumatını əməkdaşa təhlükəsiz özünüz verin. Adi əməkdaş bu əməliyyatı edə bilmir. Mövcud emailin parolu dəyişdirilmir; həmin hesab üçün emailə bağlı dəvət keçidi istifadə olunur. Yarımçıq sorğunu eyni məlumatla yenidən göndərin; fərqli payload eyni işi gizlicə dəyişmir. Email/SMTP hazır olduqda normal qeydiyyat, təsdiq və reset axınını canlıda ayrıca yoxlayın.
 
 ## Gündəlik idarəetmə
 
@@ -61,7 +61,7 @@ launchctl bootout gui/$(id -u)/com.apma.crm.backup
 
 Fon işi Desktop-dan asılı deyil, öz private Application Support kataloqundan işləyir. Supabase CLI-nin agent/non-agent JSON format fərqi nəzərə alınıb. Hesab açarı rotasiyasından sonra installer-i yenidən işlədin. Vercel/Supabase ödənişli plana keçid bu scriptlərin işi deyil.
 
-Şifrəli cloud preview arxivi ayrıca lokal target-ə açılıb, DB + Storage + Vault bərpası və iki tenant izolyasiyası yoxlanıb. Son24migration testində4Storage obyekti ilə bərpa mərhələsi17,872s, deşifrə/schema/reset/verify daxil prosedur156,007s çəkib. Production surətində hələ real admin/agentlik və media yoxdur; boş production backup-un özü dolu bazanın sübutu sayılmır.
+Şifrəli cloud preview arxivi ayrıca lokal target-ə açılıb, DB + Storage + Vault bərpası və iki tenant izolyasiyası yoxlanıb. Son24migration testində4Storage obyekti ilə bərpa mərhələsi17,872s, deşifrə/schema/reset/verify daxil prosedur156,007s çəkib. Production surətində adminin Auth hesabı var; agentlik və real media hələ yoxdur; boş production backup-un özü dolu bazanın sübutu sayılmır.
 
 Lokal məşq mənbəsi 54322-dir; restore scripti yalnız ayrılmış 55322 hədəfini qəbul edir. Production-a səhv restore cəhdi rədd olunur:
 

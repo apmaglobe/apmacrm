@@ -24,15 +24,21 @@ test("admin browser: 2500 CSV rows → private upload → mapping → preview �
       mimeType: "text/csv",
       buffer: Buffer.from(csv),
     });
+  const inspected=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().postDataJSON()?.operation==="import.inspect",{timeout:30000});
   await page
     .getByRole("button", { name: "Önbaxışı yoxla", exact: true })
     .click();
+  expect((await inspected).status()).toBe(200);
   await expect(
     page.getByText("2500 sətir · 0 xəta", { exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({timeout:15000});
+  const previewed=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().postDataJSON()?.operation==="import.preview",{timeout:30000});
+  const applied=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().postDataJSON()?.operation==="import.apply",{timeout:30000});
   await page
     .getByRole("button", { name: "Önbaxışı tətbiq et", exact: true })
     .click();
+  const previewResponse=await previewed;expect(previewResponse.status()).toBe(200);
+  const appliedResponse=await applied;const appliedResult=await appliedResponse.json();expect(appliedResponse.status(),String(appliedResult.code??"first import batch")).toBe(200);
   await expect(page.getByRole("status")).toContainText(
     "2500 sətir tətbiq edildi. Import tamamlandı.",
     { timeout: 90000 },
@@ -85,14 +91,16 @@ test("mobile creator: create → drag/confirm → payment → replacement", asyn
     .getByLabel("Kassa / bank", { exact: true })
     .selectOption({ label: "Sınaq bank hesabı" });
   await page.getByLabel("Məbləğ (AZN)", { exact: true }).fill("300");
+  const paymentSaved=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().method()==="POST");
   await page
     .getByRole("button", { name: "Ödənişi qeydə al", exact: true })
     .click();
+  expect((await paymentSaved).status()).toBe(200);
   await expect(
     page
       .getByRole("dialog")
       .getByRole("button", { name: "Düzəlt", exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({timeout:15000});
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Düzəlt", exact: true })

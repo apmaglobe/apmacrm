@@ -25,9 +25,11 @@ export async function login(page: Page, index = 1, org = 0) {
   await page.getByRole("button", { name: "Daxil ol", exact: true }).click();
   if (user.totp) {
     await page.getByLabel("Təsdiq kodu").fill(totp(user.totp));
+    const verified=page.waitForResponse(r=>r.url().includes("/auth/v1/factors/")&&r.url().endsWith("/verify"),{timeout:30000});
     await page.getByRole("button", { name: "Davam et", exact: true }).click();
+    expect((await verified).status()).toBe(200);
     await expect(page.getByRole("status")).toContainText(
-      "İki mərhələli təsdiq tamamlandı",
+      "İki mərhələli təsdiq tamamlandı", {timeout:15000},
     );
     await page
       .getByRole("button", { name: "İş sahəsinə keç", exact: true })

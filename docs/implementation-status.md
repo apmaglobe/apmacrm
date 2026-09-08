@@ -4,20 +4,20 @@
 
 ## Qüvvədə olan qərarlar
 
-AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 və son istifadəçi göstərişləri tətbiq edilir. Orijinal sənəd paketləri/arxivləri qorunur. Ayrı Supabase/Vercel `apma-crm` seçilib. İlk admin `apmaglobe@gmail.com`; ilkin ünvan Vercel, custom domain sonra. **Xəritə/Geoapify və email/SMTP/DNS istifadəçi tərəfindən sonraya saxlanıb; bunlara yenidən başlamayın və eyni sualları soruşmayın.** Real Excel və logo verilməyib. Əvvəl SMTP cavabında verilmiş rəqəm credential kimi istifadə edilməyib.
+AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 və son istifadəçi göstərişləri tətbiq edilir. Orijinal sənəd paketləri/arxivləri qorunur. Ayrı Supabase/Vercel `apma-crm` seçilib. İlk admin `apmaglobe@gmail.com`; ilkin ünvan Vercel, custom domain sonra. **Xəritə/Geoapify və email/SMTP/DNS istifadəçi tərəfindən sonraya saxlanıb; bunlara yenidən başlamayın və eyni sualları soruşmayın.** Real Excel və logo verilməyib; istifadəçi onları da sonraya saxlayıb. Son göstəriş: admin paneldən email göndərmədən əməkdaş əlavə etmək, tam qara fon və simmetrik ikonlar. Əvvəl SMTP cavabında verilmiş rəqəm credential kimi istifadə edilməyib.
 
 ## Faktiki resurslar
 
 | Mühit | Resurs | Vəziyyət |
 |---|---|---|
-| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 24 migration |
-| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 24 migration |
+| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 29 migration |
+| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 29 migration |
 | Supabase təşkilat | apmaglobe, `mxpdnlyaiddizgeuwbwx` | Yeni ödənişli plan alınmayıb |
 | Vercel | apmaglobe / `team_Jce1EdJI8YIHwHAFgUxunCqq`; layihə `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` | Hobby, bir OWNER; CLI bağlıdır |
-| Son preview | https://apma-10cmh78v9-apmaglobe.vercel.app | Preview-7 READY; Vercel protection tətbiq olunur |
+| Son preview | https://apma-p462vuwz7-apmaglobe.vercel.app | Preview-11 READY; Vercel protection tətbiq olunur |
 | Əsas alias | apma-crm.vercel.app | Hələ production təhvili deyil |
 
-Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; real admin hələ provision edilməyib. SMTP çatdırılması yoxlanmayıb. İlk avtomatik Production alias-ları qəbuldan əvvəl silinib; son deploy-lar explicit preview-dir. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
+Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. TOTP/claim addımı hələ hesab sahibi tərəfindən tamamlanmalıdır. SMTP çatdırılması yoxlanmayıb. İlk avtomatik Production alias-ları qəbuldan əvvəl silinib; son deploy-lar explicit preview-dir. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
 
 ## Mərhələlər üzrə nəticə
 
@@ -34,29 +34,41 @@ Public/server env-lər preview və production üçün ayrı bazalara bağlıdır
 
 Frontend: əlaqəli müştəri adları ilk100 lookup-dan kənarda da yüklənir; parent ID üzrə əlaqəli maliyyə/work məlumatı, siyahı pagination, Bakı tarix formatı, export AZN/önbaxış, profil fəaliyyəti. Login/MFA-dan sonra yeni document ilə auth keşi yenilənir. Mobil menyu hydration hazır olana qədər disabled-dir. Webhook body limiti stream oxunarkən tətbiq edilir. Export xətasında yalnız SQLSTATE loglanır.
 
+25-ci migration: admin-only/AAL2 manual əməkdaş yaratma üçün parolsuz intent, əvvəlcədən ayrılan Auth UUID və current admin ilə atomik membership/departament completion. Auth çağırışı itərsə eyni admin/form yeni sorğu ID-si ilə yarımçıq işi bərpa edə bilir; mövcud hesaba parol reset edilmir. `/api/members` bounded body, same-origin, server-only key; UI Userlər→Əməkdaş əlavə et. İstifadəçi email göndərmədən manual aktivləşdirməni ayrıca təsdiqləyib.
+
+Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra saxlanır; ikonlar kvadrat/mərkəzdədir. Mobil tenant seçimi menyudadır.
+
+26-cı migration: `export_page` hər500source sətirində cari tenant/aktor/field/export hüququnu yoxlayır. CSV yalnız əsas cədvəli, XLSX bütün vərəqləri yükləyir. Böyümüş12500sətirlik preview export-un57014/HTTP503 timeout-u bundan əvvəl aşkarlanıb. Template/header tema düyməsi də hydration hazır olana qədər disabled-dir.
+
+27-ci migration: manual üzvlük tamamlananda tranzaksiya daxilində bir Realtime outbox hadisəsi yaranır; digər açıq admin sessiyası yeni əməkdaşı görür. Təkrar sorğu ikinci hadisə yaratmır. Export status endpoint-i ağır worker batch-ni sinxron gözləmir; durable cron işləyir. Browser test reporter-i request credential-lərini çıxışdan silir.
+
+28–29-cu migration: export snapshot bir dəfə private 500 sətirlik hissələrə ayrılır; hər download səhifəsi bütün böyük JSON-u yenidən açmır. Chunk-lar current tenant/object/field yoxlamasından keçir və artifact expiry ilə cascade silinir. Eyni 15 min sətirlik cloud artifact üzrə ilk səhifə DB ölçməsi 644,952 ms → 71,677 ms oldu; bu ümumi download P95 deyil. Böyük cloud download təkrar sınaqda keçdi.
+
 ## Son yoxlamalar
 
-- PostgreSQL **39/39**, 24 migration: `.local/db-final.log`.
+- PostgreSQL **41/41**, 29 migration: `.local/db-29c.log`; manual provision saga, current admin/MFA, user_metadata spoof deny, same request/reopened form retry, tenant isolation, password payload rejection.
 - Vitest **9/9**: `.local/unit-22.log`; sonrakı app dəyişiklikləri parser/pul unit funksiyalarını dəyişməyib.
 - Tam lokal production-server Playwright **14/14, 2,7 dəqiqə**: `.local/e2e-final.log` (23 migration). Son mobil/export düzəlişindən sonra təsirlənən **2/2**: `.local/e2e-24.log`.
 - Preview-5 **13/13**; preview-6 **12/14**, mobil erkən klik və bir export endirməsi uğursuz. Export təkrarında keçib; mobil readiness guard və UUID lookup düzəlişi əlavə edilib. **Preview-7 tam14/14, 4,3dəqiqə keçib** (`.local/preview-e2e-7.log`).
-- Son `pnpm build` və `pnpm typecheck` keçib. `pnpm lint`: **0 error, 3 warning** — auth/MFA sərhədində qəsdən hard navigation. `.local/build-24.log`, `.local/type-24.log`, `.local/lint-24.log`.
-- Production security advisor **0 lint**; preview **1 WARN**: Free planda leaked-password protection yoxdur. HIBP Pro tələb edir, ödənişli upgrade edilməyib. Performance: production64/preview24 unused-index INFO; WARN/ERROR yoxdur.
+- Son `pnpm build` və `pnpm typecheck` keçib. `pnpm lint`: **0 error, 3 warning** — auth/MFA sərhədində qəsdən hard navigation. `.local/build-27.log`, `.local/type-29.log`, `.local/lint-29.log`.
+- Production və preview security advisor hərəsində **1 WARN**: Free planda leaked-password protection yoxdur. HIBP Pro tələb edir, ödənişli upgrade edilməyib. Performance: production66/preview26 unused-index INFO; WARN/ERROR yoxdur.
 - Yük/Realtime/LCP və restore rəqəmləri [test-results](test-results.md)-də; [AC-01–76 matrisi](acceptance-matrix.md) sübutları və əhatə sərhədlərini göstərir.
+
+- Preview-11 manual əməkdaş create/login/tenant/retry və ikinci admin Realtime keçib (20,7 saniyə); black theme/reload/portal/mobile icons keçib (4,5 saniyə). Son təkrar CRM/To Do/Realtime 27,9 saniyə, 2500 import 30,4 saniyə keçib. Cloud mutation-dan ekrana 6,119 saniyəlik tək müşahidə də var; performans SLA-sı iddia edilmir.
 
 ## Backup və admin
 
-Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production hələ boşdur.
+Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production-da artıq adminin Auth hesabı var; agentlik və real iş məlumatları hələ yaradılmayıb.
 
-`pnpm exec tsx scripts/activate-admin.ts`: hesab sahibi gizli terminalda parolu özü seçir; mövcud hesab reset edilmir. Sonra login→TOTP→İlk admini aktivləşdir. Script real admin üçün hələ işlədilməyib. Təlimat [runbook](runbook.md)-dadır.
+İstifadəçinin birbaşa göstərişi ilə admin Auth hesabı artıq yaradılıb və parolla giriş yoxlanıb. Parol repo/loga yazılmayıb. Mövcud hesab üçün `scripts/activate-admin.ts`-i yenidən işlətməyin. Login→TOTP→İlk admini aktivləşdir addımı hesab sahibinə aiddir. Təlimat [runbook](runbook.md)-dadır.
 
 ## Davam nöqtəsi
 
-1. Preview-7 tam14/14 keçib; kod və24migration uyğun gəlir. Lokal39DB/9unit və build/typecheck nəticələri yuxarıdadır; yeni dəyişiklik olmadan suite-ləri yenidən başlatma.
-2. Son backup installer24migrationla yenilənib, avtomatik uğur06:27:56UTC. Cloud→local24migration restore06:35:39UTC keçib; cron bağlı, restore stack dayandırılıb. Köhnə generated Auth trace/error-context report-ları silinib; sanitizəli loglar private saxlanır.
+1. Son düzəlişlərdən sonra əvvəl uğursuz olan bütün browser ssenariləri təkrar yoxlamada keçib. Preview-11 tam ilkin suite 11/16 idi; 29 migration ilə aylıq/export/Overview 3 keçid (`.local/preview-e2e-11b.log`), son CRM/To Do/Realtime və 2500 import 2/2 (`.local/preview-e2e-11c.log`) keçib. Bu, bir yeni tam16/16 run iddiası deyil. Son app build preview-11-dir; 28–29 yalnız migration/test dəyişiklikləridir. Müstəqil düzəliş işi tamamdır; production hesab/plan addımları aşağıdadır.
+2. Backup runtime 29 migration ilə yenilənib; avtomatik şifrəli backup 07:42:49 UTC-də verified=true, 57,557 saniyə, 0 Storage obyekti ilə tamamlanıb. Son full restore 24 migration, 06:35:39 UTC-dir; stack dayandırılıb. Sonrakı schema üçün full restore iddia edilmir. Generated error-context report-ları təmizlənib; məxfi məlumatı olmayan yekun loglar `.local`-da saxlanır.
 3. Kommersiya buraxılışı üçün Vercel Pro **20USD/ay, bir deploy seat daxil; vergi və əlavə istifadə ayrıca**. Yeni ödənişli resurs üçün istifadəçi əvvəl faktiki xərc tələb edib; upgrade hələ təsdiqlənməyib/alınmayıb. Bütün müstəqil iş hazır olanda yalnız bu yeni ödəniş qərarını soruş. Supabase Free hələ saxlanır.100AZN hədəfdir, zəmanət deyil.
 4. Xərc təsdiqindən sonra seçilmiş Vercel layihəsində test olunmuş kodu **production env ilə yenidən build/deploy** et; preview env build-ini birbaşa promote etmə. Faktiki alias/login/API-ni yoxla. Admin provisioning/TOTP hesab sahibinin təhlükəsiz giriş addımıdır.
-5. Real Excel/logo çatışmır; email və xəritə təxirə salınıb. Bunları hazır göstərmə. AC matrisində ayrıca yoxlanmamış variasiyaları universal keçdi sayma.
+5. Real Excel/logo da istifadəçi tərəfindən təxirə salınıb; email və xəritə də deferred qalır. Manual əməkdaş onboarding-i SMTP-dən asılı deyil. Bunları hazır göstərmə. AC matrisində ayrıca yoxlanmamış variasiyaları universal keçdi sayma.
 
 ## Lokal davam
 

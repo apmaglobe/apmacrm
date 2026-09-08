@@ -62,12 +62,14 @@ test("desktop: login → create → confirm → todo; second session realtime", 
   await expect(
     page.getByRole("cell", { name: title + " işi", exact: true }),
   ).toBeVisible();
+  const updated=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().method()==="POST",{timeout:30000});
   await page
     .getByLabel(title + " işi statusu")
     .last()
     .selectOption("doing");
+  expect((await updated).status()).toBe(200);
   await expect(page.getByLabel(title + " işi statusu").last()).toHaveValue(
-    "doing",
+    "doing", {timeout:15000},
   );
   await page.screenshot({ path: ".local/desktop-todo.png", fullPage: true });
   await ctx.close();

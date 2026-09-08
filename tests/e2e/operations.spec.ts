@@ -67,10 +67,13 @@ test("meeting: mobile create with participants → calendar → ICS", async ({
     .getByLabel("Online HTTPS link")
     .fill("https://meet.google.com/abc-defg-hij");
   await page.getByLabel("Admin", { exact: true }).check();
+  const saved=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().method()==="POST");
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Saxla", exact: true })
     .click();
+  expect((await saved).status()).toBe(200);
+  await expect(page.getByRole("dialog")).not.toBeVisible({timeout:15000});
   const card = page
     .locator("article")
     .filter({ has: page.getByRole("heading", { name: title, exact: true }) });
@@ -108,13 +111,17 @@ test("private chat: second session message → membership removal invalidates op
   await page.getByRole("button", { name: "Söhbət yarat" }).click();
   await page.getByLabel("Söhbət adı").fill(title);
   await page.getByLabel("Murad", { exact: true }).check();
+  const created=page.waitForResponse(r=>r.url().endsWith("/api/command")&&r.request().method()==="POST");
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Saxla", exact: true })
     .click();
+  expect((await created).status()).toBe(200);
+  const committed=Date.now();
   await expect(
     second.getByRole("button", { name: title, exact: true }),
-  ).toBeVisible();
+  ).toBeVisible({timeout:15000});
+  console.log("Chat conversation visible after mutation response",Date.now()-committed,"ms");
   await second.getByRole("button", { name: title, exact: true }).click();
   await expect(second.getByLabel("Mesaj", { exact: true })).toBeVisible();
   const body = "Məxfi sınaq " + Date.now();

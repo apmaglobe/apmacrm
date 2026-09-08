@@ -2,7 +2,7 @@
 
 Supabase Postgres/Auth/RLS/Storage/Realtime və Next.js/React/TypeScript üzərində agentlik CRM-i. M1–M6 qurulması davam edir; cari vəziyyət [implementation-status](docs/implementation-status.md), [qəbul matrisi](docs/acceptance-matrix.md) və [test nəticələri](docs/test-results.md), faktiki resurslar [resource-map](docs/resource-map.md), gündəlik əməliyyat və admin/backup təlimatı [runbook](docs/runbook.md)-dadır.
 
-İstifadəçinin son göstərişi ilə xəritə və email/SMTP/DNS sonrakı işə saxlanıb. Real Excel/logo təqdim edilməyib. İstifadə olunan fixture-lər sintetikdir.
+İstifadəçinin son göstərişi ilə xəritə və email/SMTP/DNS sonrakı işə saxlanıb. Real Excel/logo da istifadəçi tərəfindən sonraya saxlanıb. Admin paneldə email göndərmədən aktiv əməkdaş yaratma var. İstifadə olunan fixture-lər sintetikdir.
 
 ## Lokal işə salma
 

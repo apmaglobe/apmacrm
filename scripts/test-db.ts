@@ -610,17 +610,43 @@ try {
     await pool.query("select private.process_exports()");
     const read=()=>as(member,"select public.download_export($1,$2) result",[orgA,queued.id]);
     const first=JSON.stringify((await read())[0].result);assert.ok(first.includes("deal_cards"));
+    const page=async(user=member,index=0,offset=0)=>(await as<{r:{rows:Record<string,unknown>[];table:string;next_offset:number|null}}>(user,"select public.export_page($1,$2,$3,$4) r",[orgA,queued.id,index,offset]))[0].r;
+    await reject(member,"select * from private.export_chunks",[],"permission denied");
+    const chunkCount=async()=>(await pool.query("select count(*)::int n from private.export_chunks where job_id=$1",[queued.id])).rows[0].n;
+    const chunks=await chunkCount();assert.ok(chunks>0);
+    await pool.query("select private.chunk_export(job_id,data) from private.export_artifacts where job_id=$1",[queued.id]);assert.equal(await chunkCount(),chunks);
+    assert.equal((await page()).table,"deal_cards");assert.ok((await page()).rows.length<=500);
+    await assert.rejects(page(bAdmin),/EXPORT_DENIED/);await assert.rejects(page(member,0,-1),/INVALID_EXPORT_PAGE/);
+
     await reject(other,"select public.download_export($1,$2)",[orgA,queued.id],"EXPORT_DENIED");
     await reject(bAdmin,"select public.download_export($1,$2)",[orgA,queued.id],"EXPORT_DENIED");
     await pool.query(`update public.memberships set overrides=overrides||'{"commercials.read":"deny"}' where id=$1`,[mM]);
     const hidden=(await read())[0].result as {tables:{table:string;rows:Record<string,unknown>[]}[]};
     assert.equal(hidden.tables.find(t=>t.table==="work_prices")!.rows.length,0);
+    assert.ok((await page()).rows.every(r=>!("commercial" in r)));
+    assert.equal((await page(member,2)).rows.length,0);
     assert.ok(hidden.tables.find(t=>t.table==="deal_cards")!.rows.every(r=>!("commercial" in r)));
     await pool.query(`update public.memberships set overrides=overrides||'{"crm.export":"deny"}' where id=$1`,[mM]);
     await reject(member,"select public.download_export($1,$2)",[orgA,queued.id],"EXPORT_DENIED");
+    await assert.rejects(page(),/EXPORT_DENIED/);
     await pool.query("update public.export_jobs set expires_at=now()-interval '1 second' where id=$1",[queued.id]);
     await pool.query("select private.process_exports()");
-    assert.equal((await pool.query("select count(*)::int n from private.export_artifacts where job_id=$1",[queued.id])).rows[0].n,0);
+    assert.equal((await pool.query("select count(*)::int n from private.export_artifacts where job_id=$1",[queued.id])).rows[0].n,0);assert.equal(await chunkCount(),0);
+  });
+  await check("paged export covers every source once and cleans private chunks",async()=>{
+    const queued=await rpc(admin,"export","create",{module:"map",format:"csv",filters:{}},1,randomUUID());
+    await pool.query("select private.process_exports()");
+    const expected=Number((await pool.query("select count(*) n from public.customers where organization_id=$1 and not archived",[orgA])).rows[0].n);assert.ok(expected>500);
+    const ids=new Set<string>();let offset=0;let count=0;
+    for(;;){
+      const result=(await as<{r:{rows:{id:string}[];next_offset:number|null;next_part:number|null}}>(admin,"select public.export_page($1,$2,0,$3) r",[orgA,queued.id,offset]))[0].r;
+      assert.ok(result.rows.length<=500);assert.equal(result.next_part,null);
+      for(const row of result.rows){assert.ok(!ids.has(row.id));ids.add(row.id);count++;}
+      if(result.next_offset===null)break;assert.equal(result.next_offset,offset+500);offset=result.next_offset;
+    }
+    assert.equal(count,expected);
+    await pool.query("update public.export_jobs set expires_at=now()-interval '1 second' where id=$1",[queued.id]);await pool.query("select private.process_exports()");
+    assert.equal((await pool.query("select count(*)::int n from private.export_chunks where job_id=$1",[queued.id])).rows[0].n,0);
   });
   await check("AC-19 webhook management, encrypted keys, retry and immutable owner",async()=>{
     const dep=(await pool.query('select department_id from public.work_items where deal_id=$1 limit 1',[deal.id])).rows[0].department_id;
@@ -725,6 +751,29 @@ try {
     await pool.query("update public.contract_periods set period_start=period_start-1 where id=$1",[period.id]);
     assert.equal((await as(admin,"select private.display_stage($1,$2) s",[orgA,period.deal_id]))[0].s,"recurring_todo");
     assert.equal((await pool.query("select private.paid($1,$2) p",[orgA,period.deal_id])).rows[0].p,"0");
+  });
+  await check("manual member saga requires current admin/MFA, trusted Auth identity and idempotency",async()=>{
+    const request=randomUUID(),payload={name:"Manual employee",email:randomUUID()+"@example.test",role_id:null,departments:[depts[0].id]};
+    const prepare=async(user=admin,body=payload)=>(await as<{j:{id:string;auth_user_id:string}}>(user,"select public.prepare_member($1,$2,$3) j",[orgA,request,body]))[0].j;
+    await assert.rejects(prepare(member),/ADMIN_REQUIRED/);await assert.rejects(prepare(bAdmin),/ADMIN_REQUIRED/);
+    await assert.rejects(as(admin,"select public.prepare_member($1,$2,$3)",[orgA,request,{...payload,password:"must-never-store"}]),/INVALID_MEMBER_FIELDS/);
+    await assert.rejects(prepare(admin,{...payload,departments:[randomUUID()]}),/INVALID_DEPARTMENT/);
+    const j=await prepare();assert.deepEqual(await prepare(),j);
+    const reopened=(await as<{j:{id:string}}>(admin,"select public.prepare_member($1,$2,$3) j",[orgA,randomUUID(),payload]))[0].j;assert.equal(reopened.id,j.id);
+    await assert.rejects(prepare(admin,{...payload,name:"Changed"}),/IDEMPOTENCY_CONFLICT/);
+    const complete=async()=>as<{r:{id:string}}>(admin,"select public.complete_member($1,$2) r",[orgA,j.id]);
+    await assert.rejects(complete(),/AUTH_PROVISIONING_INCOMPLETE/);
+    await pool.query("insert into auth.users(id,email,email_confirmed_at,raw_user_meta_data) values($1,$2,now(),$3)",[j.auth_user_id,payload.email,{apma_provisioning_id:j.id}]);
+    await assert.rejects(complete(),/AUTH_PROVISIONING_INCOMPLETE/);
+    await pool.query("update auth.users set raw_app_meta_data=$2 where id=$1",[j.auth_user_id,{apma_provisioning_id:j.id}]);
+    const done=(await complete())[0].r;assert.deepEqual((await complete())[0].r,done);
+    assert.equal((await pool.query("select count(*)::int n from public.outbox_events where organization_id=$1 and topic='membership' and entity_id=$2",[orgA,done.id])).rows[0].n,1);
+    const m=(await pool.query("select * from public.memberships where id=$1",[done.id])).rows[0];assert.equal(m.status,"active");assert.equal(m.is_admin,false);
+    assert.equal((await as(j.auth_user_id,"select * from public.customers where organization_id=$1",[orgB])).length,0);
+    assert.equal((await pool.query("select count(*)::int n from public.department_members where member_id=$1",[done.id])).rows[0].n,1);
+    const persisted=(await pool.query("select payload from private.member_provisioning where id=$1",[j.id])).rows[0].payload;assert.equal('password' in persisted,false);
+    await assert.rejects(as(admin,"select public.prepare_member($1,$2,$3)",[orgA,randomUUID(),payload]),/ACCOUNT_ALREADY_EXISTS/);
+    const weak=await pool.connect();try{await weak.query('begin');await weak.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:admin,role:'authenticated',aal:'aal1'})]);await weak.query('set local role authenticated');await assert.rejects(()=>weak.query("select public.prepare_member($1,$2,$3)",[orgA,randomUUID(),payload]),/ADMIN_REQUIRED/);}finally{await weak.query('rollback');weak.release();}
   });
   await check("AC-05 commercial denial also protects API", async () => {
     await pool.query(

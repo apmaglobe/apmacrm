@@ -3,6 +3,8 @@ export default defineConfig({
   testDir: "tests/e2e",
   outputDir: process.env.APMA_TEST_URL ? ".local/preview-test-results" : "test-results",
   timeout: 60000,
+  // Cloud round trips include WAN and cold starts. Business assertions remain identical.
+  expect: { timeout: process.env.APMA_TEST_URL ? 15000 : 5000 },
   fullyParallel: false,
   workers: 1,
   use: {
@@ -20,5 +22,5 @@ export default defineConfig({
     },
     trace: "off", // Auth requests must not be persisted into trace artifacts.
   },
-  reporter: [["list"], ["html", { open: "never",outputFolder:process.env.APMA_TEST_URL?".local/preview-playwright-report":"playwright-report" }]],
+  reporter: [["./tests/safe-reporter.ts"]],
 });

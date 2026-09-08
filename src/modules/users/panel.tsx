@@ -1,4 +1,5 @@
 "use client";
+import {AddMember} from "./add-member";
 import {Activity} from "./activity";
 import Image from "next/image";
 import { Settings } from "./settings";
@@ -30,6 +31,7 @@ export function Users({ org, data, member, refresh }: PanelProps) {
         <p className="muted">Komanda, departament və səlahiyyətlər</p>
         {member.is_admin && (
           <div className="toolbar">
+            <button className="primary" onClick={() => setAdd("member")}><Plus size={18}/>Əməkdaş əlavə et</button>
             <button onClick={() => setAdd("invite")}>Dəvət keçidi</button>
             <button className="primary" onClick={() => setAdd("role")}>
               <Plus size={17} />
@@ -38,6 +40,7 @@ export function Users({ org, data, member, refresh }: PanelProps) {
           </div>
         )}
       </div>
+      {add === "member" && <AddMember org={org} roles={data.roles??[]} departments={data.departments??[]} onClose={()=>setAdd("")} onCreated={refresh}/>}
       {add === "invite" && (
         <Modal
           title="Emailə bağlı dəvət"
@@ -235,7 +238,7 @@ export function Users({ org, data, member, refresh }: PanelProps) {
           </Form>
         </Modal>
       )}
-      {((add && add !== "invite") || role) && (
+      {((add && !["invite","member"].includes(add)) || role) && (
         <Modal
           title={
             add === "department"
