@@ -9,16 +9,16 @@
 | Preview baza | apma-crm-preview — `obtlqejryfvcqfsjxeda`, Frankfurt, Free |
 | Vercel komanda | APMAGLOBE / apmaglobe — `team_Jce1EdJI8YIHwHAFgUxunCqq` |
 | Vercel layihə | apma-crm — `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` |
-| Son yoxlanmış preview | https://apma-p462vuwz7-apmaglobe.vercel.app — preview-11 READY; 29 migration, Vercel protection |
+| Son yoxlanmış preview | https://apma-gzigowsh4-apmaglobe.vercel.app — preview-12 READY; 30 migration, Vercel protection |
 | Əsas ünvan | https://apma-crm.vercel.app — Hobby production READY |
-| Production deploy | https://apma-jtkyo0bbi-apmaglobe.vercel.app — `dpl_CBUXS2LfGRsRQ5f9xwosSKiyNLHA`, commit `8384ac5` |
+| Production deploy | https://apma-of1qh8ir5-apmaglobe.vercel.app — `dpl_9Jn99e3uVeKQb5nQTWJRS8RgFAXK`, commit `ea25826` |
 | Vercel runtime | Node 24.x; Next.js 16.3.4; server regionu fra1 |
 | Lokal | Colima apma-crm; API 54321, DB 54322, Mailpit 54324, Next 3000 |
 | Lokal restore | apmacrm_restore; API 55321, DB 55322; cron bağlı |
 
 Preview və production NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY və SUPABASE_SECRET_KEY dəyişənləri ayrı bazalara bağlıdır. Server secret Vercel-də sensitive-dir. `.env.local` lokal bazanı saxlayır; onu production ilə əvəz etməyin.
 
-İlk admin üçün `apmaglobe@gmail.com` bootstrap allowlist-dədir. Auth hesabı istifadəçinin seçdiyi parolla yaradılıb və login yoxlanıb; TOTP/ilk admin claim addımı istifadəçinin cihazında tamamlanmalıdır. Adi Auth metadata-sı admin hüququ vermir.
+İlk admin üçün `apmaglobe@gmail.com` bootstrap allowlist-dədir. Auth hesabı istifadəçinin seçdiyi parolla yaradılıb və login yoxlanıb; Authenticator artıq qurulub. Yeni girişdə kod təsdiqindən sonra ilk admin claim avtomatikdir; mövcud təsdiqlənmiş sessiyada ayrıca aktivləşdirmə düyməsi görünür. Adi Auth metadata-sı admin hüququ vermir.
 
 ## Təxirə salınanlar
 

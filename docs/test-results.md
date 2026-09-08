@@ -89,3 +89,13 @@ Auth request-lərini saxlayan Playwright trace bağlıdır. Köhnə generated tr
 2026-09-08T07:52:47.256Z: production smoke **6/6** keçdi (`.local/production-smoke.json`): 1440px və 390px login səhifəsi HTTP200 və daşma yoxdur; girişsiz Data API401; girişsiz workspace login-ə yönəlir; real admin email/parolu ilə Auth200 və production Supabase hostu təsdiqlənir; TOTP/aktivləşdirmə düyməsi görünür. İlk cəhddə test login-dən sonrakı redirect-i gözləmədiyindən ERR_ABORTED aldı; redirect gözləməsi əlavə olundu, ikinci run keçdi. İstifadəçinin TOTP-si qurulmadı və admin claim onun yerinə edilmədi.
 
 Yeni deployment üzrə 10 dəqiqəlik error log sorğusunda runtime xətası çıxmadı (`.local/production1-errors.jsonl`). Bu, davamlı monitorinq və ya bütün funksional suite-in production-da yenidən icrası deyil; tam iş axınlarının sübutları yuxarıdakı ayrıca preview testləridir. Ayrıca drain/24 saat monitorinq konfiqurasiya edilməyib.
+
+## Giriş dövrəsi düzəlişi — 30-cu migration
+
+İstifadəçi videosunda TOTP təsdiqi uğurlu idi, sonra ümumi giriş forması və «İş sahəsinə keç» düyməsi yenidən görünürdü. Production-da hesabın verified TOTP faktoru vardı, lakin bootstrap claim/membership yox idi. Giriş indi yalnız uyğun növbəti addımı göstərir və TOTP-dən sonra uyğun ilk admini avtomatik aktivləşdirib CRM-ə keçir.
+
+DB **41/41** (`.local/db-30.log`), build/typecheck keçib, lint **0 error / 2 hard-navigation warning**. Lokal **5/5**, preview-12 **5/5** keçib: mövcud CRM/To Do/Realtime, manual əməkdaş, qara tema, ilk adminin yarımçıq enrollment-dən sonra bərpası, yanlış kodun rəddi, düzgün TOTP→auto claim→CRM, reload/təkrar giriş, qeyri-admin pending ekranı. `.local/e2e-30.log`, `.local/preview-e2e-12.log`. TOTP secret yalnız sintetik sınaq hesabının response-undan RAM-da istifadə edilib; istifadəçinin faktoru dəyişdirilməyib.
+
+Production deployment `dpl_9Jn99e3uVeKQb5nQTWJRS8RgFAXK`, commit `ea25826`, production env ilə build14s, READY. Backup runtime30migration ilə yenilənib; avtomatik nəticə08:14:23UTC,32,327s,verified=true. Full restore24migration sübutu saxlanır.
+
+Production giriş düzəlişi smoke **4/4** keçib (`.local/production-login-fix-smoke.json`):1440px/390px login200/daşma yoxdur; real admin parolu200 və düzgün production hostu; yalnız MFA növbəti addımı, təkrar password/«İş sahəsinə keç» düymələri yoxdur; refresh MFA mərhələsini saxlayır. İstifadəçinin cari TOTP kodu daxil edilməyib və onun production claim-i test adı ilə yerinə yetirilməyib. Yeni deploy-un error log sorğusunda0runtime xəta görünür (`.local/production2-errors.jsonl`).

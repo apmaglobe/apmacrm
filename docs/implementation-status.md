@@ -1,6 +1,6 @@
 # APMA CRM — icra vəziyyəti
 
-08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; Hobby planında production yerləşdirmə READY-dir. İlk adminin TOTP/aktivləşdirmə addımı və təxirə salınan funksiyalar qalır.**
+08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; Hobby planında production yerləşdirmə READY-dir. İlk adminin öz cihazındakı kodla girişi və təxirə salınan funksiyalar qalır.**
 
 ## Qüvvədə olan qərarlar
 
@@ -10,15 +10,15 @@ AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 v
 
 | Mühit | Resurs | Vəziyyət |
 |---|---|---|
-| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 29 migration |
-| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 29 migration |
+| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 30 migration |
+| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 30 migration |
 | Supabase təşkilat | apmaglobe, `mxpdnlyaiddizgeuwbwx` | Yeni ödənişli plan alınmayıb |
 | Vercel | apmaglobe / `team_Jce1EdJI8YIHwHAFgUxunCqq`; layihə `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` | Hobby, bir OWNER; CLI bağlıdır |
-| Son preview | https://apma-p462vuwz7-apmaglobe.vercel.app | Preview-11 READY; Vercel protection tətbiq olunur |
+| Son preview | https://apma-gzigowsh4-apmaglobe.vercel.app | Preview-12 READY; Vercel protection tətbiq olunur |
 | Əsas ünvan | https://apma-crm.vercel.app | Hobby production READY; ayrıca production env ilə build edilib |
-| Production deploy | https://apma-jtkyo0bbi-apmaglobe.vercel.app | `dpl_CBUXS2LfGRsRQ5f9xwosSKiyNLHA`; tətbiq commit `8384ac5` |
+| Production deploy | https://apma-of1qh8ir5-apmaglobe.vercel.app | `dpl_9Jn99e3uVeKQb5nQTWJRS8RgFAXK`; tətbiq commit `ea25826` |
 
-Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. TOTP/claim addımı hələ hesab sahibi tərəfindən tamamlanmalıdır. SMTP çatdırılması yoxlanmayıb. İlkin preview yoxlamalarından sonra `--prod` ilə ayrıca production build yerləşdirilib; preview artifact production-a promote edilməyib. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
+Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. 08.09-da istifadəçinin Authenticator faktorunun verified olduğu yoxlanıb; ilkin admin claim hələ tamamlanmamışdı. Yeni axın TOTP ilə uğurlu girişdən sonra uyğun ilk admini avtomatik aktivləşdirir. Artıq AAL2 sessiyası olan istifadəçiyə tək aktivləşdirmə düyməsi göstərilir. SMTP çatdırılması yoxlanmayıb. İlkin preview yoxlamalarından sonra `--prod` ilə ayrıca production build yerləşdirilib; preview artifact production-a promote edilməyib. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
 
 ## Mərhələlər üzrə nəticə
 
@@ -45,13 +45,15 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 
 28–29-cu migration: export snapshot bir dəfə private 500 sətirlik hissələrə ayrılır; hər download səhifəsi bütün böyük JSON-u yenidən açmır. Chunk-lar current tenant/object/field yoxlamasından keçir və artifact expiry ilə cascade silinir. Eyni 15 min sətirlik cloud artifact üzrə ilk səhifə DB ölçməsi 644,952 ms → 71,677 ms oldu; bu ümumi download P95 deyil. Böyük cloud download təkrar sınaqda keçdi.
 
+30-cu migration və giriş düzəlişi: `login_context()` yalnız cari hesabın active membership/admin MFA/bootstrap uyğunluğu bayraqlarını oxuyur, giriş hüququ vermir. İlk adminin TOTP təsdiqindən sonra claim və CRM keçidi avtomatikdir. Təsdiqlənmiş sessiyada boş login forması göstərilmir; pending istifadəçinin ayrıca ekranı var. Yarımçıq TOTP qurulması verified faktorları silmədən yenilənir. Videoda MFA uğurlu idi, amma hesab hələ ilk admin kimi aktivləşməmişdi.
+
 ## Son yoxlamalar
 
-- PostgreSQL **41/41**, 29 migration: `.local/db-29c.log`; manual provision saga, current admin/MFA, user_metadata spoof deny, same request/reopened form retry, tenant isolation, password payload rejection.
+- PostgreSQL **41/41**, 30 migration: `.local/db-30.log`; manual provision saga, current admin/MFA, user_metadata spoof deny, same request/reopened form retry, tenant isolation, password payload rejection.
 - Vitest **9/9**: `.local/unit-22.log`; sonrakı app dəyişiklikləri parser/pul unit funksiyalarını dəyişməyib.
 - Tam lokal production-server Playwright **14/14, 2,7 dəqiqə**: `.local/e2e-final.log` (23 migration). Son mobil/export düzəlişindən sonra təsirlənən **2/2**: `.local/e2e-24.log`.
 - Preview-5 **13/13**; preview-6 **12/14**, mobil erkən klik və bir export endirməsi uğursuz. Export təkrarında keçib; mobil readiness guard və UUID lookup düzəlişi əlavə edilib. **Preview-7 tam14/14, 4,3dəqiqə keçib** (`.local/preview-e2e-7.log`).
-- Son `pnpm build` və `pnpm typecheck` keçib. `pnpm lint`: **0 error, 3 warning** — auth/MFA sərhədində qəsdən hard navigation. `.local/build-27.log`, `.local/type-29.log`, `.local/lint-29.log`.
+- Son `pnpm build` və `pnpm typecheck` keçib. `pnpm lint`: **0 error, 2 warning** — auth/MFA sərhədində qəsdən hard navigation. `.local/build-30.log`, `.local/type-30.log`, `.local/lint-30.log`.
 - Production və preview security advisor hərəsində **1 WARN**: Free planda leaked-password protection yoxdur. HIBP Pro tələb edir, ödənişli upgrade edilməyib. Performance: production66/preview26 unused-index INFO; WARN/ERROR yoxdur.
 - Yük/Realtime/LCP və restore rəqəmləri [test-results](test-results.md)-də; [AC-01–76 matrisi](acceptance-matrix.md) sübutları və əhatə sərhədlərini göstərir.
 
@@ -59,18 +61,20 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 
 - Hobby production build READY, 21 saniyə; faktiki əsas ünvan HTTP200. Production smoke 6/6: desktop/mobile login, anonim API401/redirect, real admin parol girişi və düzgün production Supabase hostu, aktivləşdirmə girişi. `.local/production-smoke.json`; yeni deployment error log sorğusunda 0 runtime xəta. Tam funksional suite production-da təkrarlanmayıb; preview sübutları yuxarıdadır.
 
+- Giriş loop düzəlişi: lokal 5/5 (`.local/e2e-30.log`) və preview-12 5/5 (`.local/preview-e2e-12.log`): CRM/To Do/Realtime, manual əməkdaş, black theme, yarımçıq enrollment→yanlış/doğru TOTP→auto bootstrap→refresh→yenidən login, pending səhifəsi.
+
 ## Backup və admin
 
 Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production-da artıq adminin Auth hesabı var; agentlik və real iş məlumatları hələ yaradılmayıb.
 
-İstifadəçinin birbaşa göstərişi ilə admin Auth hesabı artıq yaradılıb və parolla giriş yoxlanıb. Parol repo/loga yazılmayıb. Mövcud hesab üçün `scripts/activate-admin.ts`-i yenidən işlətməyin. Login→TOTP→İlk admini aktivləşdir addımı hesab sahibinə aiddir. Təlimat [runbook](runbook.md)-dadır.
+İstifadəçinin birbaşa göstərişi ilə admin Auth hesabı artıq yaradılıb və parolla giriş yoxlanıb. Parol repo/loga yazılmayıb. Mövcud hesab üçün `scripts/activate-admin.ts`-i yenidən işlətməyin. Login→Authenticator kodu istifadəçinin öz cihazına aiddir; sonrakı admin claim/CRM keçidi avtomatikdir. Mövcud AAL2 sessiyası üçün bir «İlk admini aktivləşdir» düyməsi qalır. Təlimat [runbook](runbook.md)-dadır.
 
 ## Davam nöqtəsi
 
-1. Son düzəlişlərdən sonra əvvəl uğursuz olan bütün browser ssenariləri təkrar yoxlamada keçib. Preview-11 tam ilkin suite 11/16 idi; 29 migration ilə aylıq/export/Overview 3 keçid (`.local/preview-e2e-11b.log`), son CRM/To Do/Realtime və 2500 import 2/2 (`.local/preview-e2e-11c.log`) keçib. Bu, bir yeni tam16/16 run iddiası deyil. Son app build preview-11-dir; 28–29 yalnız migration/test dəyişiklikləridir. Müstəqil düzəliş işi tamamdır; production yerləşdirməsi də tamamlanıb; ilk adminin öz cihazında TOTP addımı qalır.
-2. Backup runtime 29 migration ilə yenilənib; avtomatik şifrəli backup 07:42:49 UTC-də verified=true, 57,557 saniyə, 0 Storage obyekti ilə tamamlanıb. Son full restore 24 migration, 06:35:39 UTC-dir; stack dayandırılıb. Sonrakı schema üçün full restore iddia edilmir. Generated error-context report-ları təmizlənib; məxfi məlumatı olmayan yekun loglar `.local`-da saxlanır.
+1. Giriş dövrəsi düzəldilib və production-2-yə yerləşdirilib: `ea25826`, 30 migration. Lokal 5/5 və preview-12 5/5 təsirlənən ssenari keçib; production real admin parol girişi→yalnız MFA addımı→refresh üçün 4/4 smoke keçib. İstifadəçinin cari TOTP kodu daxil edilməyib, onun admin claim tamamlanması hələ ayrıca təsdiqlənməyib. Əvvəlki geniş suite nəticələri test-results.md-də saxlanır.
+2. Backup runtime 30 migration ilə yenilənib; avtomatik şifrəli backup 08:14:23 UTC-də verified=true, 32,327 saniyə, 0 Storage obyekti ilə tamamlanıb. Son full restore 24 migration, 06:35:39 UTC-dir; stack dayandırılıb. Sonrakı schema üçün full restore iddia edilmir. Generated error-context report-ları təmizlənib; məxfi məlumatı olmayan yekun loglar `.local`-da saxlanır.
 3. İstifadəçi Vercel Pro-nu hələlik istəmir. Hobby və Supabase Free saxlanılıb; ödənişli plan alınmayıb. Bu seçimi təkrar təsdiqlətməyin. Hobby kommersiya məhdudiyyəti əvvəl izah edilib; yerləşdirmə həmin qaydanın dəyişməsi və ya xərc/sürət zəmanəti deyil.
-4. Seçilmiş Vercel layihəsində production env ilə build/deploy tamamlanıb. Faktiki ünvan yuxarıdadır. İlk admin `apmaglobe@gmail.com` ilə daxil olub öz cihazında TOTP-ni təsdiqləməli, sonra «İlk admini aktivləşdir» seçməlidir. Əməkdaşlar Userlər → Əməkdaş əlavə et ilə emailsiz yaradılır.
+4. Seçilmiş Vercel layihəsində production env ilə build/deploy tamamlanıb. Faktiki ünvan yuxarıdadır. İlk admin `apmaglobe@gmail.com` ilə daxil olub öz cihazında cari Authenticator kodunu təsdiqləyir; claim və CRM-ə keçid avtomatikdir. Əməkdaşlar Userlər → Əməkdaş əlavə et ilə emailsiz yaradılır.
 5. Real Excel/logo da istifadəçi tərəfindən təxirə salınıb; email və xəritə də deferred qalır. Manual əməkdaş onboarding-i SMTP-dən asılı deyil. Bunları hazır göstərmə. AC matrisində ayrıca yoxlanmamış variasiyaları universal keçdi sayma.
 
 ## Lokal davam
