@@ -1,219 +1,123 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { browserClient } from "@/lib/auth/browser";
+type LoginContext = {has_active_membership:boolean;requires_mfa:boolean;bootstrap_pending:boolean};
+type Mode = "loading" | "login" | "register" | "reset" | "password" | "mfa" | "setup" | "activate" | "account" | "pending";
 export function Login() {
   const db = browserClient();
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState<Mode>("loading");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [factor, setFactor] = useState("");
   const [qr, setQr] = useState("");
   const [signed, setSigned] = useState(false);
+  const [email, setEmail] = useState("");
+  const resolve = useCallback(async (enter = false) => {
+    const {data:{user}} = await db.auth.getUser();
+    if (!user) {setSigned(false);setMode("login");return;}
+    setSigned(true);setEmail(user.email??"");
+    const [{data,error},assurance,factors] = await Promise.all([
+      db.rpc("login_context"),db.auth.mfa.getAuthenticatorAssuranceLevel(),db.auth.mfa.listFactors(),
+    ]);
+    if(error||assurance.error||factors.error)throw Error("LOGIN_CONTEXT_FAILED");
+    const context=data as LoginContext;
+    const verified=factors.data.totp.find(f=>f.status==="verified");
+    if(assurance.data.currentLevel!=="aal2" && (verified||context.requires_mfa||context.bootstrap_pending)){
+      setQr("");setFactor(verified?.id??"");setMode(verified?"mfa":"setup");return;
+    }
+    if(context.bootstrap_pending){
+      setMode("activate");
+      if(!enter)return;
+      const claimed=await db.rpc("claim_bootstrap");
+      if(claimed.error)throw Error("BOOTSTRAP_FAILED");
+      window.location.assign("/workspace/crm");return;
+    }
+    if(context.has_active_membership){
+      setMode("account");
+      if(enter)window.location.assign("/workspace/crm");
+    }else setMode("pending");
+  },[db]);
   useEffect(() => {
-    const {data}=db.auth.onAuthStateChange((_event,session)=>setSigned(!!session));
-    return ()=>data.subscription.unsubscribe();
-  }, [db]);
+    let timer:ReturnType<typeof setTimeout>;
+    const {data}=db.auth.onAuthStateChange((event)=>{
+      // Supabase emits this callback while holding its auth lock; resolve outside that lock.
+      if(event==="INITIAL_SESSION")timer=setTimeout(()=>{void resolve().catch(()=>{setMode("login");setMessage("Hesabın vəziyyəti yüklənmədi. Yenidən daxil olun.");});},0);
+      if(event==="SIGNED_OUT"){setSigned(false);setMode("login");setQr("");}
+    });
+    return ()=>{clearTimeout(timer);data.subscription.unsubscribe();};
+  }, [db,resolve]);
+  async function resume(){
+    setBusy(true);setMessage("");
+    try{await resolve(true);}catch{setMessage("Hesab aktivləşdirilə bilmədi. Yenidən sınayın.");}finally{setBusy(false);}
+  }
   async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setBusy(true);
-    setMessage("");
+    e.preventDefault();setBusy(true);setMessage("");
     const form = new FormData(e.currentTarget);
-    const email = String(form.get("email") ?? "");
-    const password = String(form.get("password") ?? "");
+    const inputEmail=String(form.get("email")??"");
+    const password=String(form.get("password")??"");
     try {
-      if (mode === "register") {
-        const { error } = await db.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: location.origin + "/auth/callback" },
-        });
-        if (error) throw error;
-        setMessage("Email ünvanınıza göndərilən təsdiq keçidini açın.");
-      } else if (mode === "reset") {
-        const { error } = await db.auth.resetPasswordForEmail(email, {
-          redirectTo: location.origin + "/auth/callback",
-        });
-        if (error) throw error;
-        setMessage("Ünvan uyğun olarsa, şifrə yeniləmə keçidi göndəriləcək.");
-      } else if (mode === "password") {
-        const { error } = await db.auth.updateUser({ password });
-        if (error) throw error;
-        setMessage("Şifrə yeniləndi.");
-      } else if (mode === "mfa") {
-        const { error } = await db.auth.mfa.challengeAndVerify({
-          factorId: factor,
-          code: String(form.get("code")),
-        });
-        if (error) throw error;
-        setSigned(true);
-        setMode("login");
-        setQr("");
-        setMessage(
-          "İki mərhələli təsdiq tamamlandı. İş sahəsinə daxil ola bilərsiniz.",
-        );
-      } else {
-        const { error } = await db.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        setSigned(true);
-        const { data } = await db.auth.mfa.listFactors();
-        if (data?.totp.length) {
-          setFactor(data.totp[0].id);
-          setMode("mfa");
-        } else window.location.assign("/workspace/crm");
+      if(mode==="register"){
+        const {error}=await db.auth.signUp({email:inputEmail,password,options:{emailRedirectTo:location.origin+"/auth/callback"}});
+        if(error)throw error;setMessage("Email ünvanınıza göndərilən təsdiq keçidini açın.");
+      }else if(mode==="reset"){
+        const {error}=await db.auth.resetPasswordForEmail(inputEmail,{redirectTo:location.origin+"/auth/callback"});
+        if(error)throw error;setMessage("Ünvan uyğun olarsa, şifrə yeniləmə keçidi göndəriləcək.");
+      }else if(mode==="password"){
+        const {error}=await db.auth.updateUser({password});if(error)throw error;setMessage("Şifrə yeniləndi.");
+      }else if(mode==="mfa"){
+        const {error}=await db.auth.mfa.challengeAndVerify({factorId:factor,code:String(form.get("code"))});
+        if(error){setMessage("Təsdiq kodu qəbul edilmədi. Authenticator tətbiqindəki cari 6 rəqəmli kodu yazın.");return;}
+        setQr("");await resolve(true);
+      }else{
+        const {error}=await db.auth.signInWithPassword({email:inputEmail,password});if(error)throw error;
+        await resolve(true);
       }
-    } catch {
-      setMessage(
-        "Əməliyyat alınmadı. Məlumatları və email təsdiqini yoxlayın.",
-      );
-    } finally {
-      setBusy(false);
-    }
+    }catch{setMessage("Əməliyyat alınmadı. Məlumatları və bağlantını yoxlayıb yenidən sınayın.");}
+    finally{setBusy(false);}
   }
-  async function enroll() {
-    setBusy(true);
-    try {
-      const existing = await db.auth.mfa.listFactors();
-      const verified = existing.data?.totp.find((f) => f.status === "verified");
-      if (verified) {
-        setFactor(verified.id);
-        setMode("mfa");
-        return;
+  async function enroll(){
+    setBusy(true);setMessage("");
+    try{
+      const existing=await db.auth.mfa.listFactors();if(existing.error)throw existing.error;
+      const verified=existing.data.totp.find(f=>f.status==="verified");
+      if(verified){setFactor(verified.id);setQr("");setMode("mfa");return;}
+      // Only replace this account's unfinished enrollment; verified factors are preserved.
+      for(const unfinished of existing.data.all.filter(f=>f.factor_type==="totp"&&f.status==="unverified")){
+        const {error}=await db.auth.mfa.unenroll({factorId:unfinished.id});if(error)throw error;
       }
-      const { data, error } = await db.auth.mfa.enroll({
-        factorType: "totp",
-        friendlyName: "APMA CRM",
-      });
-      if (error) throw error;
-      setFactor(data.id);
-      setQr(data.totp.qr_code);
-      setMode("mfa");
-    } catch {
-      setMessage("TOTP hazırlana bilmədi. Yenidən daxil olun.");
-    } finally {
-      setBusy(false);
-    }
+      const {data,error}=await db.auth.mfa.enroll({factorType:"totp",friendlyName:"APMA CRM"});
+      if(error)throw error;setFactor(data.id);setQr(data.totp.qr_code);setMode("mfa");
+    }catch{setMessage("Authenticator hazırlana bilmədi. Yenidən sınayın.");}finally{setBusy(false);}
   }
-  async function bootstrap() {
-    setBusy(true);
-    const { error } = await db.rpc("claim_bootstrap");
-    setBusy(false);
-    if (error)
-      setMessage(
-        "Aktivləşmə üçün təyin olunmuş admin emaili, email təsdiqi və TOTP lazımdır.",
-      );
-    else window.location.assign("/workspace/crm");
-  }
-  return (
-    <main className="auth">
-      <div className="auth-card">
-        <div className="brand">
-          APMA<span>CRM</span>
-        </div>
-        <p className="eyebrow">AGENTLİYİN İŞ SAHƏSİ</p>
-        <h1>
-          {mode === "register"
-            ? "Hesab yaradın"
-            : mode === "reset"
-              ? "Şifrəni bərpa edin"
-              : mode === "mfa"
-                ? "İki mərhələli təsdiq"
-                : mode === "password"
-                  ? "Yeni şifrə"
-                  : "Xoş gəlmisiniz"}
-        </h1>
-        <form key={mode} onSubmit={submit}>
-          {mode === "mfa" ? (
-            <>
-              {qr && (
-                <div className="qr" dangerouslySetInnerHTML={{ __html: qr }} />
-              )}
-              <label>
-                Təsdiq kodu
-                <input
-                  name="code"
-                  inputMode="numeric"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  required
-                  autoComplete="one-time-code"
-                />
-              </label>
-            </>
-          ) : (
-            <>
-              {mode !== "password" && (
-                <label>
-                  Email
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                  />
-                </label>
-              )}
-              {mode !== "reset" && (
-                <label>
-                  Şifrə
-                  <input
-                    name="password"
-                    type="password"
-                    minLength={mode === "login" ? 8 : 10}
-                    required
-                    autoComplete={
-                      mode === "register" ? "new-password" : "current-password"
-                    }
-                  />
-                </label>
-              )}
-            </>
-          )}
-          <button className="primary" disabled={busy}>
-            {busy ? "Gözləyin…" : mode === "login" ? "Daxil ol" : "Davam et"}
-          </button>
-        </form>
-        {message && (
-          <p role="status" className="notice">
-            {message}
-          </p>
-        )}
-        <div className="auth-links">
-          <button
-            onClick={() => setMode(mode === "register" ? "login" : "register")}
-          >
-            {mode === "register" ? "Girişə qayıt" : "Qeydiyyat"}
-          </button>
-          <button onClick={() => setMode("reset")}>Şifrəni unutdum</button>
-        </div>
-        {signed && (
-          <div className="stack">
-            <button onClick={enroll} disabled={busy}>
-              TOTP qur / təsdiqlə
-            </button>
-            <button onClick={bootstrap} disabled={busy}>
-              İlk admini aktivləşdir
-            </button>
-            <button onClick={() => setMode("password")}>Şifrəni yenilə</button>
-            <button
-              disabled={busy || mode === "mfa"}
-              onClick={() => {
-                window.location.assign("/workspace/crm");
-              }}
-            >
-              İş sahəsinə keç
-            </button>
-            <button
-              onClick={async () => {
-                await db.auth.signOut();
-                setSigned(false);
-                setMessage("Hesabdan çıxıldı.");
-              }}
-            >
-              Çıxış
-            </button>
-          </div>
-        )}
-      </div>
-    </main>
-  );
+  const titles:Record<Mode,string>={loading:"Hesab yoxlanır…",login:"Xoş gəlmisiniz",register:"Hesab yaradın",reset:"Şifrəni bərpa edin",password:"Yeni şifrə",mfa:"İki mərhələli təsdiq",setup:"Admin hesabını qoruyun",activate:"Admin hesabınız hazırdır",account:"Girişiniz təsdiqlənib",pending:"Üzvlük təsdiqi gözlənilir"};
+  const showForm=["login","register","reset","password","mfa"].includes(mode);
+  return <main className="auth"><div className="auth-card">
+    <div className="brand">APMA<span>CRM</span></div>
+    <p className="eyebrow">AGENTLİYİN İŞ SAHƏSİ</p><h1>{titles[mode]}</h1>
+    {signed&&<p className="helper">{email}</p>}
+    {mode==="loading"&&<p role="status">Giriş vəziyyəti yoxlanır…</p>}
+    {mode==="setup"&&<div className="stack"><p>İlk giriş üçün telefonunuzdakı Authenticator tətbiqini qoşun. Kodu təsdiqlədikdən sonra admin hesabınız aktivləşəcək və CRM açılacaq.</p><button className="primary" disabled={busy} onClick={enroll}>{busy?"Hazırlanır…":"Authenticator qur"}</button></div>}
+    {mode==="activate"&&<div className="stack"><p>Təhlükəsizlik təsdiqi tamamlanıb. Agentliyin ilk admin hesabını aktivləşdirin.</p><button className="primary" disabled={busy} onClick={resume}>{busy?"Aktivləşdirilir…":"İlk admini aktivləşdir"}</button></div>}
+    {mode==="account"&&<button className="primary" disabled={busy} onClick={resume}>CRM-ə daxil ol</button>}
+    {mode==="pending"&&<div className="stack"><p>Hesabınıza giriş edilib. İş sahəsini açmaq üçün agentliyin admini üzvlüyünüzü aktivləşdirməlidir.</p><button disabled={busy} onClick={resume}>Vəziyyəti yenilə</button></div>}
+    {showForm&&<form key={mode} onSubmit={submit}>
+      {mode==="mfa"?<>
+        {qr&&<><p>Authenticator tətbiqində bu QR kodunu skan edin.</p><Image unoptimized className="qr" src={qr} width={240} height={240} alt="Authenticator QR kodu"/></>}
+        <p className="helper">Telefonunuzdakı Authenticator tətbiqindən cari 6 rəqəmli kodu daxil edin. Təsdiqdən sonra CRM avtomatik açılacaq.</p>
+        <label>Təsdiq kodu<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required/></label>
+      </>:<>
+        {mode!=="password"&&<label>Email<input name="email" type="email" autoComplete="email" required/></label>}
+        {mode!=="reset"&&<label>Şifrə<input name="password" type="password" minLength={mode==="register"||mode==="password"?10:undefined} autoComplete={mode==="register"||mode==="password"?"new-password":"current-password"} required/></label>}
+      </>}
+      <button className="primary" disabled={busy}>{busy?"Gözləyin…":mode==="login"?"Daxil ol":"Davam et"}</button>
+    </form>}
+    {message&&<p role="status" className="notice">{message}</p>}
+    {!signed&&mode!=="loading"&&<div className="auth-links"><button disabled={busy} onClick={()=>{setMessage("");setMode(mode==="register"?"login":"register");}}>{mode==="register"?"Girişə qayıt":"Qeydiyyat"}</button><button disabled={busy} onClick={()=>{setMessage("");setMode("reset");}}>Şifrəni unutdum</button></div>}
+    {signed&&<div className="stack">
+      {(mode==="account"||mode==="pending")&&<button disabled={busy} onClick={()=>{setMessage("");setMode("password");}}>Şifrəni yenilə</button>}
+      {mode==="password"&&<button disabled={busy} onClick={()=>{setMessage("");void resolve();}}>Hesaba qayıt</button>}
+      <button disabled={busy} onClick={async()=>{await db.auth.signOut({scope:"local"});setSigned(false);setMode("login");setQr("");setMessage("");}}>Çıxış</button>
+    </div>}
+  </div></main>;
 }

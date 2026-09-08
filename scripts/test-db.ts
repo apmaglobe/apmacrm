@@ -732,7 +732,10 @@ try {
     await reject(other,'select public.claim_bootstrap()',[],'BOOTSTRAP_NOT_AUTHORIZED');
     await pool.query('insert into private.bootstrap_admins(email,organization_name,slug) values($1,$2,$3)',[admin+'@example.test','Bootstrap synthetic','bootstrap-'+admin]);
     const weak=await pool.connect();try{await weak.query('begin');await weak.query("select set_config('request.jwt.claims',$1,true)",[JSON.stringify({sub:admin,role:'authenticated',aal:'aal1'})]);await weak.query('set local role authenticated');await assert.rejects(()=>weak.query('select public.claim_bootstrap()'),/VERIFIED_EMAIL_AND_MFA_REQUIRED/);}finally{await weak.query('rollback');weak.release();}
+    const context=(await as(admin,'select public.login_context() state'))[0].state as {bootstrap_pending:boolean;requires_mfa:boolean};assert.equal(context.bootstrap_pending,true);assert.equal(context.requires_mfa,true);
+    const unrelated=(await as(other,'select public.login_context() state'))[0].state as {bootstrap_pending:boolean};assert.equal(unrelated.bootstrap_pending,false);
     const first=(await as(admin,'select public.claim_bootstrap() id'))[0].id;
+    assert.equal(((await as(admin,'select public.login_context() state'))[0].state as {bootstrap_pending:boolean}).bootstrap_pending,false);
     const retry=(await as(admin,'select public.claim_bootstrap() id'))[0].id;assert.equal(first,retry);
     const saved=(await pool.query('select is_admin,status from public.memberships where organization_id=$1 and user_id=$2',[first,admin])).rows;assert.equal(saved.length,1);assert.equal(saved[0].is_admin,true);assert.equal(saved[0].status,'active');
   });

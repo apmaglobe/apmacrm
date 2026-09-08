@@ -4,7 +4,7 @@ import { createHmac } from "node:crypto";
 const fixtures = JSON.parse(
   readFileSync(process.env.APMA_FIXTURE_FILE ?? ".local/fixture.json", "utf8"),
 );
-function totp(secret: string) {
+export function totp(secret: string) {
   const abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
   const bits = [...secret.toUpperCase()]
     .map((c) => abc.indexOf(c).toString(2).padStart(5, "0"))
@@ -28,12 +28,7 @@ export async function login(page: Page, index = 1, org = 0) {
     const verified=page.waitForResponse(r=>r.url().includes("/auth/v1/factors/")&&r.url().endsWith("/verify"),{timeout:30000});
     await page.getByRole("button", { name: "Davam et", exact: true }).click();
     expect((await verified).status()).toBe(200);
-    await expect(page.getByRole("status")).toContainText(
-      "İki mərhələli təsdiq tamamlandı", {timeout:15000},
-    );
-    await page
-      .getByRole("button", { name: "İş sahəsinə keç", exact: true })
-      .click();
+
   }
   await expect(page).toHaveURL(/workspace/);
   await expect(

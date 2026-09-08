@@ -3,7 +3,6 @@ import { Workspace } from "@/components/workspace";
 import { ModulePage } from "@/components/module-page";
 import { modules } from "@/lib/domain";
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
 export default async function Page({
   params,
   searchParams,
@@ -27,24 +26,7 @@ export default async function Page({
   const org =
     active.find((m) => m.organization_id === requested)?.organization_id ??
     active[0]?.organization_id;
-  if (!org)
-    return (
-      <main className="auth">
-        <div className="auth-card">
-          <div className="brand">
-            APMA<span>CRM</span>
-          </div>
-          <h1>İş sahəsinə giriş</h1>
-          <p>
-            Üzvlük müraciətiniz təsdiqlənməlidir. İlk adminsinizsə, emaili və
-            TOTP-ni təsdiqləyib hesabı aktivləşdirin.
-          </p>
-          <Link className="button primary" href="/login">
-            Hesab və aktivləşdirmə
-          </Link>
-        </div>
-      </main>
-    );
+  if (!org) redirect("/login");
   const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
   if (
     active.find((m) => m.organization_id === org)?.is_admin &&
