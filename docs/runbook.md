@@ -1,5 +1,7 @@
 # APMA CRM — işlətmə və bərpa
 
+Əsas ünvan: https://apma-crm.vercel.app — istifadəçinin seçimi ilə Hobby planı saxlanılıb.
+
 Bu təlimat qurulmuş kod üçündür. Bütün qəbul meyarlarının tamamlandığı iddiası deyil; cari boşluqlar implementation-status.md-dədir. İlk admin: apmaglobe@gmail.com.
 
 ## İlk adminin təhlükəsiz aktivləşdirilməsi
@@ -39,7 +41,7 @@ Webhook Userlər panelində yaradılır. Verilən yeni signing key yalnız məxf
 1. `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:db`, `pnpm test:e2e`, `pnpm build`. Build və dev serveri eyni `.next` qovluğuna paralel yazdırmayın.
 2. Migration-ları əvvəl lokal boş bazada və ayrıca preview-də yoxlayın. Supabase pluginlə tətbiq olunmuş migration timestamp-ləri CLI fayl timestamp-lərindən fərqlənə bilər; ad/SQL uyğunluğunu yoxlamadan `db push` etməyin. Tarixçəni explicit migration repair ilə uzlaşdırın; keçmiş SQL-i dağıdıcı dəyişməyin.
 3. Vercel-də yalnız `apma-crm` layihəsi və `apmaglobe` scope-u. Preview env-ləri `obtlqejryfvcqfsjxeda`, production env-ləri `clysniomfmmxwiozfizt` bazasına aiddir. `.vercelignore` private faylları çıxarır.
-4. `pnpm dlx vercel@59.11.7 deploy --target preview --scope apmaglobe`. Faktiki URL-də əsas axınları yoxlayın. Kommersiya planı və real istifadəçi girişini tamamladıqdan sonra yoxlanmış versiyanı production-a buraxın.
+4. `pnpm dlx vercel@59.11.7 deploy --target preview --scope apmaglobe`. Faktiki URL-də əsas axınları yoxlayın. Yoxlanmış kodu production env ilə ayrıca `pnpm dlx vercel@59.11.7 deploy --prod --yes --scope apmaglobe` əmri ilə yerləşdirin; preview bazasının env-lərini promote etməyin. Cari production yerləşdirməsi tamamlanıb. İstifadəçi Hobby planını saxlayır; Pro-ya keçməyin.
 5. Frontend rollback əvvəlki sağlam deployment-ə aparılır. DB-də destructive rollback yerinə uyğun forward migration; maliyyə/source tarixçəsini geri yazmaq olmaz. Restore daha geniş insident prosedurudur.
 
 ## Backup və restore

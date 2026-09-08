@@ -1,10 +1,10 @@
 # APMA CRM — icra vəziyyəti
 
-08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; kommersiya production buraxılışı hələ tamamlanmayıb.**
+08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; Hobby planında production yerləşdirmə READY-dir. İlk adminin TOTP/aktivləşdirmə addımı və təxirə salınan funksiyalar qalır.**
 
 ## Qüvvədə olan qərarlar
 
-AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 və son istifadəçi göstərişləri tətbiq edilir. Orijinal sənəd paketləri/arxivləri qorunur. Ayrı Supabase/Vercel `apma-crm` seçilib. İlk admin `apmaglobe@gmail.com`; ilkin ünvan Vercel, custom domain sonra. **Xəritə/Geoapify və email/SMTP/DNS istifadəçi tərəfindən sonraya saxlanıb; bunlara yenidən başlamayın və eyni sualları soruşmayın.** Real Excel və logo verilməyib; istifadəçi onları da sonraya saxlayıb. Son göstəriş: admin paneldən email göndərmədən əməkdaş əlavə etmək, tam qara fon və simmetrik ikonlar. Əvvəl SMTP cavabında verilmiş rəqəm credential kimi istifadə edilməyib.
+AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 və son istifadəçi göstərişləri tətbiq edilir. Orijinal sənəd paketləri/arxivləri qorunur. Ayrı Supabase/Vercel `apma-crm` seçilib. İlk admin `apmaglobe@gmail.com`; ilkin ünvan Vercel, custom domain sonra. **Xəritə/Geoapify və email/SMTP/DNS istifadəçi tərəfindən sonraya saxlanıb; bunlara yenidən başlamayın və eyni sualları soruşmayın.** Real Excel və logo verilməyib; istifadəçi onları da sonraya saxlayıb. Son göstəriş: admin paneldən email göndərmədən əməkdaş əlavə etmək, tam qara fon və simmetrik ikonlar. Əvvəl SMTP cavabında verilmiş rəqəm credential kimi istifadə edilməyib. **Son qərar: Vercel Pro-ya keçməyin; mövcud Hobby ilə davam edin. Pro təsdiqini təkrar soruşmayın və ödənişli plan aktivləşdirməyin.**
 
 ## Faktiki resurslar
 
@@ -15,9 +15,10 @@ AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 v
 | Supabase təşkilat | apmaglobe, `mxpdnlyaiddizgeuwbwx` | Yeni ödənişli plan alınmayıb |
 | Vercel | apmaglobe / `team_Jce1EdJI8YIHwHAFgUxunCqq`; layihə `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` | Hobby, bir OWNER; CLI bağlıdır |
 | Son preview | https://apma-p462vuwz7-apmaglobe.vercel.app | Preview-11 READY; Vercel protection tətbiq olunur |
-| Əsas alias | apma-crm.vercel.app | Hələ production təhvili deyil |
+| Əsas ünvan | https://apma-crm.vercel.app | Hobby production READY; ayrıca production env ilə build edilib |
+| Production deploy | https://apma-jtkyo0bbi-apmaglobe.vercel.app | `dpl_CBUXS2LfGRsRQ5f9xwosSKiyNLHA`; tətbiq commit `8384ac5` |
 
-Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. TOTP/claim addımı hələ hesab sahibi tərəfindən tamamlanmalıdır. SMTP çatdırılması yoxlanmayıb. İlk avtomatik Production alias-ları qəbuldan əvvəl silinib; son deploy-lar explicit preview-dir. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
+Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. TOTP/claim addımı hələ hesab sahibi tərəfindən tamamlanmalıdır. SMTP çatdırılması yoxlanmayıb. İlkin preview yoxlamalarından sonra `--prod` ilə ayrıca production build yerləşdirilib; preview artifact production-a promote edilməyib. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
 
 ## Mərhələlər üzrə nəticə
 
@@ -56,6 +57,8 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 
 - Preview-11 manual əməkdaş create/login/tenant/retry və ikinci admin Realtime keçib (20,7 saniyə); black theme/reload/portal/mobile icons keçib (4,5 saniyə). Son təkrar CRM/To Do/Realtime 27,9 saniyə, 2500 import 30,4 saniyə keçib. Cloud mutation-dan ekrana 6,119 saniyəlik tək müşahidə də var; performans SLA-sı iddia edilmir.
 
+- Hobby production build READY, 21 saniyə; faktiki əsas ünvan HTTP200. Production smoke 6/6: desktop/mobile login, anonim API401/redirect, real admin parol girişi və düzgün production Supabase hostu, aktivləşdirmə girişi. `.local/production-smoke.json`; yeni deployment error log sorğusunda 0 runtime xəta. Tam funksional suite production-da təkrarlanmayıb; preview sübutları yuxarıdadır.
+
 ## Backup və admin
 
 Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production-da artıq adminin Auth hesabı var; agentlik və real iş məlumatları hələ yaradılmayıb.
@@ -64,10 +67,10 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 
 ## Davam nöqtəsi
 
-1. Son düzəlişlərdən sonra əvvəl uğursuz olan bütün browser ssenariləri təkrar yoxlamada keçib. Preview-11 tam ilkin suite 11/16 idi; 29 migration ilə aylıq/export/Overview 3 keçid (`.local/preview-e2e-11b.log`), son CRM/To Do/Realtime və 2500 import 2/2 (`.local/preview-e2e-11c.log`) keçib. Bu, bir yeni tam16/16 run iddiası deyil. Son app build preview-11-dir; 28–29 yalnız migration/test dəyişiklikləridir. Müstəqil düzəliş işi tamamdır; production hesab/plan addımları aşağıdadır.
+1. Son düzəlişlərdən sonra əvvəl uğursuz olan bütün browser ssenariləri təkrar yoxlamada keçib. Preview-11 tam ilkin suite 11/16 idi; 29 migration ilə aylıq/export/Overview 3 keçid (`.local/preview-e2e-11b.log`), son CRM/To Do/Realtime və 2500 import 2/2 (`.local/preview-e2e-11c.log`) keçib. Bu, bir yeni tam16/16 run iddiası deyil. Son app build preview-11-dir; 28–29 yalnız migration/test dəyişiklikləridir. Müstəqil düzəliş işi tamamdır; production yerləşdirməsi də tamamlanıb; ilk adminin öz cihazında TOTP addımı qalır.
 2. Backup runtime 29 migration ilə yenilənib; avtomatik şifrəli backup 07:42:49 UTC-də verified=true, 57,557 saniyə, 0 Storage obyekti ilə tamamlanıb. Son full restore 24 migration, 06:35:39 UTC-dir; stack dayandırılıb. Sonrakı schema üçün full restore iddia edilmir. Generated error-context report-ları təmizlənib; məxfi məlumatı olmayan yekun loglar `.local`-da saxlanır.
-3. Kommersiya buraxılışı üçün Vercel Pro **20USD/ay, bir deploy seat daxil; vergi və əlavə istifadə ayrıca**. Yeni ödənişli resurs üçün istifadəçi əvvəl faktiki xərc tələb edib; upgrade hələ təsdiqlənməyib/alınmayıb. Bütün müstəqil iş hazır olanda yalnız bu yeni ödəniş qərarını soruş. Supabase Free hələ saxlanır.100AZN hədəfdir, zəmanət deyil.
-4. Xərc təsdiqindən sonra seçilmiş Vercel layihəsində test olunmuş kodu **production env ilə yenidən build/deploy** et; preview env build-ini birbaşa promote etmə. Faktiki alias/login/API-ni yoxla. Admin provisioning/TOTP hesab sahibinin təhlükəsiz giriş addımıdır.
+3. İstifadəçi Vercel Pro-nu hələlik istəmir. Hobby və Supabase Free saxlanılıb; ödənişli plan alınmayıb. Bu seçimi təkrar təsdiqlətməyin. Hobby kommersiya məhdudiyyəti əvvəl izah edilib; yerləşdirmə həmin qaydanın dəyişməsi və ya xərc/sürət zəmanəti deyil.
+4. Seçilmiş Vercel layihəsində production env ilə build/deploy tamamlanıb. Faktiki ünvan yuxarıdadır. İlk admin `apmaglobe@gmail.com` ilə daxil olub öz cihazında TOTP-ni təsdiqləməli, sonra «İlk admini aktivləşdir» seçməlidir. Əməkdaşlar Userlər → Əməkdaş əlavə et ilə emailsiz yaradılır.
 5. Real Excel/logo da istifadəçi tərəfindən təxirə salınıb; email və xəritə də deferred qalır. Manual əməkdaş onboarding-i SMTP-dən asılı deyil. Bunları hazır göstərmə. AC matrisində ayrıca yoxlanmamış variasiyaları universal keçdi sayma.
 
 ## Lokal davam

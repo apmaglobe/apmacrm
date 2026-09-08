@@ -10,7 +10,8 @@
 | Vercel komanda | APMAGLOBE / apmaglobe — `team_Jce1EdJI8YIHwHAFgUxunCqq` |
 | Vercel layihə | apma-crm — `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` |
 | Son yoxlanmış preview | https://apma-p462vuwz7-apmaglobe.vercel.app — preview-11 READY; 29 migration, Vercel protection |
-| Planlaşdırılmış əsas alias | `apma-crm.vercel.app`; **hələ aktiv production təhvili deyil** |
+| Əsas ünvan | https://apma-crm.vercel.app — Hobby production READY |
+| Production deploy | https://apma-jtkyo0bbi-apmaglobe.vercel.app — `dpl_CBUXS2LfGRsRQ5f9xwosSKiyNLHA`, commit `8384ac5` |
 | Vercel runtime | Node 24.x; Next.js 16.3.4; server regionu fra1 |
 | Lokal | Colima apma-crm; API 54321, DB 54322, Mailpit 54324, Next 3000 |
 | Lokal restore | apmacrm_restore; API 55321, DB 55322; cron bağlı |
@@ -25,7 +26,7 @@ Preview və production NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABL
 
 ## Xərc
 
-Hazırda yeni Supabase layihələri Free-dir, Vercel komandası Hobby-dir. Ödənişli plan aktivləşdirilməyib. Vercel Hobby şəxsi/kommersiya olmayan istifadə üçündür; CRM-in kommersiya istifadəsi üçün Pro hesab addımı qalır.
+Hazırda yeni Supabase layihələri Free-dir, Vercel komandası Hobby-dir. Ödənişli plan aktivləşdirilməyib. İstifadəçi Pro keçidini təxirə salıb və mövcud Hobby ilə davam etməyi seçib. Pro üçün təkrar təsdiq istəməyin. Hobby-nin şəxsi/kommersiya olmayan istifadə məhdudiyyəti əvvəl izah edilib; texniki deploy həmin qaydanı dəyişmir.
 
 08.09.2026-da baxılmış rəsmi qiymətlər: Vercel Pro 20 USD/ay platform fee, bir deploy developer yeri daxil; əlavə istifadə/vergi; Supabase Pro 25 USD/ay və compute. Pro-dakı ikinci aktiv Micro layihə əlavə compute yarada bilər; hesab üzrə aktiv layihələr və developer yerləri satınalmadan əvvəl yenidən yoxlanmalıdır. 100 AZN zəmanətli limit deyil. CRM-in 15 əməkdaşı 15 Vercel developer yeri demək deyil.
 

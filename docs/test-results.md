@@ -81,3 +81,11 @@ Gündəlik job05:15 və login zamanı Mac-də işləyir. Mac/Docker/credential o
 Real Excel-in sütunları və logo faylı verilməyib. Xəritə/Geoapify və SMTP/email confirmation/reset delivery istifadəçi tərəfindən təxirə salınıb. Tam accessibility audit, real telefon/planşet şəbəkəsi, bütün rol/filtr/concurrency kombinasiyaları və production real istifadəçi axını ayrıca təsdiqlənməyib. Bu limitlər gizlədilmir; AC matrisi konkret sərhədləri saxlayır.
 
 Auth request-lərini saxlayan Playwright trace bağlıdır. Köhnə generated trace/error-context report-ları silinib; sanitizəli `.local/*log` nəticələri private saxlanır, ictimai artifact deyil.
+
+## Hobby production yerləşdirməsi
+
+İstifadəçinin «Pro-ya keçmə, normal ilə davam et» göstərişi ilə mövcud Hobby planı saxlanıldı. Commit `8384ac5` production env ilə ayrıca build edildi və READY oldu: https://apma-crm.vercel.app (`dpl_CBUXS2LfGRsRQ5f9xwosSKiyNLHA`). Build 21 saniyə; `.local/vercel-production-1.log`.
+
+2026-09-08T07:52:47.256Z: production smoke **6/6** keçdi (`.local/production-smoke.json`): 1440px və 390px login səhifəsi HTTP200 və daşma yoxdur; girişsiz Data API401; girişsiz workspace login-ə yönəlir; real admin email/parolu ilə Auth200 və production Supabase hostu təsdiqlənir; TOTP/aktivləşdirmə düyməsi görünür. İlk cəhddə test login-dən sonrakı redirect-i gözləmədiyindən ERR_ABORTED aldı; redirect gözləməsi əlavə olundu, ikinci run keçdi. İstifadəçinin TOTP-si qurulmadı və admin claim onun yerinə edilmədi.
+
+Yeni deployment üzrə 10 dəqiqəlik error log sorğusunda runtime xətası çıxmadı (`.local/production1-errors.jsonl`). Bu, davamlı monitorinq və ya bütün funksional suite-in production-da yenidən icrası deyil; tam iş axınlarının sübutları yuxarıdakı ayrıca preview testləridir. Ayrıca drain/24 saat monitorinq konfiqurasiya edilməyib.

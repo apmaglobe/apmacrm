@@ -35,7 +35,7 @@
 | AC-29 | Browser real drag və select status, modal bağla | Tam klaviatura/a11y audit aparılmayıb. |
 | AC-30 | 15 Auth istifadəçisi/2500müştəri/10kqutu/40kiş yük sınağı | Lokal; cloud WAN deyil. |
 | AC-31 | LCP5, EventTiming36, Realtime20 və HTTP P95 | EventTiming formal field INP deyil; real cihaz/cloud P95 yoxdur. |
-| AC-32 | Cloud şifrəli backup, ayrı restore, Vault/Storage, runtime agent | Mac bağlı olanda RPO təmin olunmur; production plan addımı qalır. |
+| AC-32 | Cloud şifrəli backup, ayrı restore, Vault/Storage, runtime agent | Mac bağlı olanda RPO təmin olunmur; istifadəçi Hobby planını saxlayır. |
 | AC-33 | DB last admin və eskalasiya; Users idarəetmə UI | Bütün dynamic role/inherit/delete variasiyaları ayrıca browser testi deyil. |
 | AC-34 | DB unrelated edit deny; browser creator edit | Əsas creator/owner sərhədi. |
 | AC-35 | DB owner dəyişməsi və dar payment hüququ daşınmır | Cross-tenant referenslər DB guard ilə qorunur. |
@@ -76,7 +76,7 @@
 | AC-70 | DB artifact owner/foreign/field/revocation/expiry; browser download | CSV/XLSX bütün modul filtrləri ayrıca test deyil. |
 | AC-71 | DB pending/suspended/bootstrapAAL2/retry; browser TOTP və manual əməkdaş create/login/tenant/retry/ikinci admin Realtime | SMTP/email/reset çatdırılması təxirə salınıb. |
 | AC-72 | Ayrı cloud→local DB/StorageSHA256/Vault/RLS/worker replay restore | Mac mövcudluğu və koordinator snapshot limitləri runbook-da. |
-| AC-73 | 12 route və əsas axınlar; productionbuild/preview | Production istifadəyə verilməyib; xəritə/email deferred, realExcel/logo yoxdur. |
+| AC-73 | 12 route və əsas axınlar; productionbuild/preview | Hobby production yerləşdirilib; ilk admin TOTP/claim qalıb. Xəritə/email/realExcel/logo deferred. |
 | AC-74 | DB future cap/reopen/redone monthly contribution | Overlap bütün müxtəlif müqavilə variasiyaları ayrıca browser testi deyil. |
 | AC-75 | DB rotation/retry; HTTP bad/validHMAC+cron | Rate overflow/timestamp bütün sərhəd HTTP variasiyaları ayrıca test deyil. |
 | AC-76 | DB zero/NULL/reason/free recurring və refund cap; unit NULL/0 | Başlanğıc qalıqlar report siyasətində ayrıdır. |
