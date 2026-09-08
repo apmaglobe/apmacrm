@@ -9,9 +9,9 @@
 | Preview baza | apma-crm-preview — `obtlqejryfvcqfsjxeda`, Frankfurt, Free |
 | Vercel komanda | APMAGLOBE / apmaglobe — `team_Jce1EdJI8YIHwHAFgUxunCqq` |
 | Vercel layihə | apma-crm — `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` |
-| Son yoxlanmış preview | https://apma-gzigowsh4-apmaglobe.vercel.app — preview-12 READY; 30 migration, Vercel protection |
+| Son yoxlanmış preview | https://apma-e2hdyhfts-apmaglobe.vercel.app — preview-13 READY; 30 migration, Vercel protection |
 | Əsas ünvan | https://apma-crm.vercel.app — Hobby production READY |
-| Production deploy | https://apma-of1qh8ir5-apmaglobe.vercel.app — `dpl_9Jn99e3uVeKQb5nQTWJRS8RgFAXK`, commit `ea25826` |
+| Production deploy | https://apma-3x5m2s6s3-apmaglobe.vercel.app — `dpl_4zXuUnoaB5tP9ALZvBxgNVF1Xynb`, commit `5fc451f` |
 | Vercel runtime | Node 24.x; Next.js 16.3.4; server regionu fra1 |
 | Lokal | Colima apma-crm; API 54321, DB 54322, Mailpit 54324, Next 3000 |
 | Lokal restore | apmacrm_restore; API 55321, DB 55322; cron bağlı |

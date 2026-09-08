@@ -1,6 +1,6 @@
 # APMA CRM — icra vəziyyəti
 
-08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; Hobby planında production yerləşdirmə READY-dir. İlk adminin öz cihazındakı kodla girişi və təxirə salınan funksiyalar qalır.**
+08.09.2026. Branch `codex/apma-crm-v1`. **M1–M6 kodu və əsas axınları qurulub; Hobby planında production yerləşdirmə READY-dir. Giriş dövrəsi düzəldilib; təxirə salınan funksiyalar qalır.**
 
 ## Qüvvədə olan qərarlar
 
@@ -14,9 +14,9 @@ AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 v
 | Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 30 migration |
 | Supabase təşkilat | apmaglobe, `mxpdnlyaiddizgeuwbwx` | Yeni ödənişli plan alınmayıb |
 | Vercel | apmaglobe / `team_Jce1EdJI8YIHwHAFgUxunCqq`; layihə `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` | Hobby, bir OWNER; CLI bağlıdır |
-| Son preview | https://apma-gzigowsh4-apmaglobe.vercel.app | Preview-12 READY; Vercel protection tətbiq olunur |
+| Son preview | https://apma-e2hdyhfts-apmaglobe.vercel.app | Preview-13 READY; Vercel protection tətbiq olunur |
 | Əsas ünvan | https://apma-crm.vercel.app | Hobby production READY; ayrıca production env ilə build edilib |
-| Production deploy | https://apma-of1qh8ir5-apmaglobe.vercel.app | `dpl_9Jn99e3uVeKQb5nQTWJRS8RgFAXK`; tətbiq commit `ea25826` |
+| Production deploy | https://apma-3x5m2s6s3-apmaglobe.vercel.app | `dpl_4zXuUnoaB5tP9ALZvBxgNVF1Xynb`; tətbiq commit `5fc451f` |
 
 Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. 08.09-da istifadəçinin Authenticator faktorunun verified olduğu yoxlanıb; ilkin admin claim hələ tamamlanmamışdı. Yeni axın TOTP ilə uğurlu girişdən sonra uyğun ilk admini avtomatik aktivləşdirir. Artıq AAL2 sessiyası olan istifadəçiyə tək aktivləşdirmə düyməsi göstərilir. SMTP çatdırılması yoxlanmayıb. İlkin preview yoxlamalarından sonra `--prod` ilə ayrıca production build yerləşdirilib; preview artifact production-a promote edilməyib. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
 
@@ -30,6 +30,8 @@ Public/server env-lər preview və production üçün ayrı bazalara bağlıdır
 - M6: private chat və access revocation, raw HMAC/Vault rotation/durable intake, permission-revalidated CSV/XLSX export, private media, backup/restore/runbook və preview yerləşdirmə.
 
 ## Son düzəlişlər
+
+08.09, UI: `5fc451f` — “Canlı” ayrıca status komponenti ilə topbar ikonlarıyla eyni hündürlükdə və mərkəzdədir. Axtarış form label-in şaquli düzülüşündən ayrılıb: ikon/mətn üfüqi, 44px hündürlük, focus göstəricisi. Qutu filtrləri 58px yığcam ikonlu başlıq, açılma oxu, hover/focus və native klaviatura idarəsi ilə yenilənib. 1440/390/360px, ağ/qara tema, axtarış/filtr HTTP200: lokal və preview-13 hərəsində 7 hədəf yoxlaması keçib; 0 page error. Yeni migration yoxdur.
 
 19–24 migration: Overview/report/gündəlik xülasə; təsviri quantity və giriş verməyən mentions; export filter uyğunluğu; shared To Do scope; Meet əlaqələri; recurring failed-job backoff; yaranmamış failed dövr planının səbəbli, atomik, idempotent bərpası; export source revalidation-da UUID index lookup.
 
@@ -65,11 +67,13 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 
 ## Backup və admin
 
-Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production-da artıq adminin Auth hesabı var; agentlik və real iş məlumatları hələ yaradılmayıb.
+Şifrəli DB+Storage baytları+app Vault backup-u hazırdır; production əl ilə və LaunchAgent ilə həqiqətən işləyib. `com.apma.crm.backup`, gündəlik05:15 və login, private `~/Library/Application Support/APMA CRM Backup`. Mac/Docker/giriş bağlıdırsa24saat RPO təmin olunmur. Offline açar nüsxəsi istifadəçi tərəfindən qorunmalıdır. Dolu cloud preview snapshot-u ayrı lokal restore stack-də DB/StorageSHA256/Vault/2tenantRLS/worker replay ilə bərpa edilib; Son24migration məşqi keçib:4Storage faylı,17,872s bərpa,156,007s decrypt/schema/reset/verify daxil prosedur. Production admin Auth hesabı var. İstifadəçinin 12:24 ekran şəklində APMA iş sahəsi açıqdır; bu UI işi zamanı real iş məlumatları dəyişdirilməyib və admin claim DB-də yenidən yoxlanmayıb.
 
 İstifadəçinin birbaşa göstərişi ilə admin Auth hesabı artıq yaradılıb və parolla giriş yoxlanıb. Parol repo/loga yazılmayıb. Mövcud hesab üçün `scripts/activate-admin.ts`-i yenidən işlətməyin. Login→Authenticator kodu istifadəçinin öz cihazına aiddir; sonrakı admin claim/CRM keçidi avtomatikdir. Mövcud AAL2 sessiyası üçün bir «İlk admini aktivləşdir» düyməsi qalır. Təlimat [runbook](runbook.md)-dadır.
 
 ## Davam nöqtəsi
+
+Son tələb tamamlandı: topbar “Canlı”, axtarış və filtr üslubu `5fc451f` ilə preview-13-də yoxlanıb, production-3 READY və əsas alias-a yerləşdirilib. Lokal/preview hərəsində7 UI yoxlaması; public production loginHTTP200 və yeni CSS-in əsas ünvandan gəldiyi təsdiqlənib (`.local/ui31-production-smoke.json`). Bu dəyişiklikdə production-da MFA keçərək iş sahəsi brauzer yoxlaması aparılmayıb; funksional vizual yoxlama preview-dədir. İstifadəçinin 12:24 screenshot-u artıq APMA iş sahəsini göstərir.
 
 1. Giriş dövrəsi düzəldilib və production-2-yə yerləşdirilib: `ea25826`, 30 migration. Lokal 5/5 və preview-12 5/5 təsirlənən ssenari keçib; production real admin parol girişi→yalnız MFA addımı→refresh üçün 4/4 smoke keçib. İstifadəçinin cari TOTP kodu daxil edilməyib, onun admin claim tamamlanması hələ ayrıca təsdiqlənməyib. Əvvəlki geniş suite nəticələri test-results.md-də saxlanır.
 2. Backup runtime 30 migration ilə yenilənib; avtomatik şifrəli backup 08:14:23 UTC-də verified=true, 32,327 saniyə, 0 Storage obyekti ilə tamamlanıb. Son full restore 24 migration, 06:35:39 UTC-dir; stack dayandırılıb. Sonrakı schema üçün full restore iddia edilmir. Generated error-context report-ları təmizlənib; məxfi məlumatı olmayan yekun loglar `.local`-da saxlanır.

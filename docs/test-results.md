@@ -2,6 +2,14 @@
 
 08.09.2026. Test hesabları və müəssisələr sintetikdir. Bu nəticələr bütün AC cümlələrinin production-da təsdiqlənməsi demək deyil. Bəndlər üzrə sübut və sərhəd [qəbul matrisində](acceptance-matrix.md) göstərilib.
 
+## Son UI düzəlişi — 08.09, `5fc451f`
+
+Build və TypeScript keçib (`.local/build-ui31.log`, `.local/type-ui31.log`). ESLint 0 error, əvvəlki 2 login hard-navigation warning saxlanır (`.local/lint-ui31.log`). Yeni biznes/DB dəyişikliyi yoxdur; geniş DB və funksional suite bu kosmetik dəyişiklik üçün təkrar işlədilməyib.
+
+Lokal və [preview-13](https://apma-e2hdyhfts-apmaglobe.vercel.app) brauzer yoxlaması hərəsində 7 hədəf yoxlaması keçib: 1440/390/360px-də status/ikon mərkəzləri və hündürlükləri eyni; search44px, ikon/input üfüqi; filtr bağlı58px; səhifə daşması yoxdur; klaviatura ilə filtr açılma və mərhələ seçərək tətbiq HTTP200; axtarış sorğusu HTTP200; 390/1440px açıq filtrlərin qara fonu `rgb(0, 0, 0)`. Hər iki mühitdə 0 page error. Sintetik əməkdaş hesabı istifadə olunub. Ekran şəkilləri vizual baxılıb; sübut `.local/ui31-local-results.json`, `.local/ui31-preview-results.json` və `.local/ui31-*.png`.
+
+Production-3 `dpl_4zXuUnoaB5tP9ALZvBxgNVF1Xynb` READY; commit `5fc451f`, ayrıca production env ilə build. Əsas [CRM URL](https://apma-crm.vercel.app)-də loginHTTP200 və üç yeni UI CSS qaydasının yayımlandığı yoxlanıb (`.local/ui31-production-smoke.json`). Production-da istifadəçinin MFA kodu daxil edilməyib; iş sahəsinin desktop/mobile vizual yoxlamaları preview-yə aiddir. Yeni deployment üçün son10dəqiqəlik error log sorğusu 0 entry qaytardı (`.local/production3-errors.jsonl`, CLI exit0); bu uzunmüddətli monitorinq iddiası deyil.
+
 ## Son təsdiqlənmiş nəticələr
 
 | Yoxlama | Nəticə | Sübut və sərhəd |
