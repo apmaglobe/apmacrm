@@ -60,7 +60,7 @@ export function ModulePage({ module, org }: { module: string; org: string }) {
         </div>
         <div className="toolbar">
           <label className="search">
-            <Search size={17} />
+            <Search size={18} aria-hidden="true" />
             <input
               aria-label="Axtarış"
               placeholder="Axtarış…"

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { allowed } from "@/lib/auth/permissions";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { Plus, Columns3, List, Clock, ArrowUpRight } from "lucide-react";
+import { Plus, Columns3, List, Clock, ArrowUpRight, SlidersHorizontal, ChevronDown } from "lucide-react";
 import {
   salesStages,
   recurringStages,
@@ -195,7 +195,14 @@ export function CRM(props: PanelProps) {
           )}
         </div>
       </div>
-      <details className="surface"><summary>Qutu filtrləri</summary><form className="form-grid" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);props.setFilters?.({...Object.fromEntries([...f.entries()].map(([k,v])=>[k,String(v)])),pipeline});}}>
+      <details className="crm-filters">
+        <summary>
+          <span className="filter-icon"><SlidersHorizontal size={18} aria-hidden="true" /></span>
+          <span>Qutu filtrləri</span>
+          <span className="filter-hint">Departament, cavabdeh və tarix</span>
+          <ChevronDown className="filter-chevron" size={18} aria-hidden="true" />
+        </summary>
+        <form className="form-grid" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);props.setFilters?.({...Object.fromEntries([...f.entries()].map(([k,v])=>[k,String(v)])),pipeline});}}>
       <Select name="department_id" label="Departament filtri" value={filters.department_id} options={data.departments??[]}/>
       <Select name="accountable_id" label="Cavabdeh filtri" value={filters.accountable_id} options={data.memberships??[]}/>
       <Select name="participant_id" label="İştirakçı filtri" value={filters.participant_id} options={data.memberships??[]}/>

@@ -102,9 +102,11 @@ function Frame({
         </button>
         <div className="top-actions">
           <span
-            className="badge"
+            className="connection-status"
+            data-live={live}
             title={live ? "Canlı bağlantı" : "Canlı bağlantı bərpa olunur"}
           >
+            <span className="connection-dot" aria-hidden="true" />
             {live ? "Canlı" : "Bağlanır…"}
           </span>
           <Link
