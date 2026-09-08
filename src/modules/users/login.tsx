@@ -100,7 +100,7 @@ export function Login() {
     {mode==="setup"&&<div className="stack"><p>İlk giriş üçün telefonunuzdakı Authenticator tətbiqini qoşun. Kodu təsdiqlədikdən sonra admin hesabınız aktivləşəcək və CRM açılacaq.</p><button className="primary" disabled={busy} onClick={enroll}>{busy?"Hazırlanır…":"Authenticator qur"}</button></div>}
     {mode==="activate"&&<div className="stack"><p>Təhlükəsizlik təsdiqi tamamlanıb. Agentliyin ilk admin hesabını aktivləşdirin.</p><button className="primary" disabled={busy} onClick={resume}>{busy?"Aktivləşdirilir…":"İlk admini aktivləşdir"}</button></div>}
     {mode==="account"&&<button className="primary" disabled={busy} onClick={resume}>CRM-ə daxil ol</button>}
-    {mode==="pending"&&<div className="stack"><p>Hesabınıza giriş edilib. İş sahəsini açmaq üçün agentliyin admini üzvlüyünüzü aktivləşdirməlidir.</p><button disabled={busy} onClick={resume}>Vəziyyəti yenilə</button></div>}
+    {mode==="pending"&&<div className="stack"><p>Hesabınıza giriş edilib. Agentliyin qoşulma və ya dəvət linkindən müraciət edin. Müraciət etmisinizsə, admin üzvlüyünüzü təsdiqlədikdən sonra iş sahəsi açılacaq.</p><button disabled={busy} onClick={resume}>Vəziyyəti yenilə</button></div>}
     {showForm&&<form key={mode} onSubmit={submit}>
       {mode==="mfa"?<>
         {qr&&<><p>Authenticator tətbiqində bu QR kodunu skan edin.</p><Image unoptimized className="qr" src={qr} width={240} height={240} alt="Authenticator QR kodu"/></>}

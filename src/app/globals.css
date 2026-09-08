@@ -1429,3 +1429,42 @@ table select {
     color: black;
   }
 }
+
+/* Tenant administration remains separate from the twelve daily work modules. */
+.mobile-admin-entry { display: none; }
+.admin-entry { color: var(--accent); }
+.admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.admin-tabs button[aria-selected="true"] { background: var(--soft); color: var(--accent); border-color: var(--accent); }
+.admin-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.admin-stats article { display: grid; grid-template-columns: 24px 1fr; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+.admin-stats svg { color: var(--accent); }
+.admin-stats strong { font-size: 28px; }
+.admin-stats span { grid-column: 2; color: var(--muted); }
+.admin-section { margin-top: 22px; }
+.admin-section .section-toolbar h2 { margin: 0; }
+.admin-filter { max-width: 240px; min-width: 180px; }
+.access-row { display: flex; align-items: center; gap: 16px; padding: 20px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.access-row:first-of-type { margin-top: 16px; }
+.access-info { flex: 1; min-width: 200px; overflow-wrap: anywhere; }
+.access-info h3 { margin: 0; }
+.access-info p { margin: 5px 0; }
+.access-row .toolbar { flex-wrap: wrap; }
+.access-status { display: inline-flex; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); font-size: 12px; white-space: nowrap; }
+.access-status.active,.access-status.approved { color: var(--accent); background: var(--soft); }
+.access-status.pending { color: var(--text); }
+.access-status.revoked,.access-status.rejected { color: var(--danger); }
+@media(max-width:760px) {
+ .main-nav .mobile-admin-entry { display: block; grid-column: 1 / -1; color: var(--accent); background: var(--soft); }
+ .admin-stats { gap: 8px; }
+ .admin-stats article { padding: 12px 8px; display: flex; flex-direction: column; text-align: center; gap: 6px; }
+ .admin-stats strong { font-size: 23px; }
+ .admin-stats span { font-size: 11px; }
+ .admin-section { padding: 16px; }
+ .access-row { gap: 12px; }
+ .access-info { min-width: 170px; }
+ .access-row .toolbar { width: 100%; }
+ .admin-tabs { gap: 6px; }
+ .admin-tabs button { flex: 1; font-size: 12px; }
+}
+
+.admin-section .empty { min-height: 96px; padding: 24px; }

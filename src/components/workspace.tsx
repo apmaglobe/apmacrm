@@ -9,7 +9,7 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Menu, Sun, Moon, LogOut, Bell, ChevronDown } from "lucide-react";
+import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck } from "lucide-react";
 import { browserClient } from "@/lib/auth/browser";
 import { modules } from "@/lib/domain";
 const subscribeReady = () => () => {};
@@ -21,11 +21,13 @@ export function Workspace({
   organizations,
   org,
   userId,
+  isAdmin = false,
 }: {
   children: React.ReactNode;
   organizations: { id: string; name: string; logo_path?:string|null }[];
   org: string;
   userId: string;
+  isAdmin?: boolean;
 }) {
   const [client] = useState(
     () =>
@@ -37,7 +39,7 @@ export function Workspace({
   );
   return (
     <QueryClientProvider client={client}>
-      <Frame org={org} organizations={organizations} userId={userId}>
+      <Frame org={org} organizations={organizations} userId={userId} isAdmin={isAdmin}>
         {children}
       </Frame>
     </QueryClientProvider>
@@ -48,11 +50,13 @@ function Frame({
   organizations,
   org,
   userId,
+  isAdmin = false,
 }: {
   children: React.ReactNode;
   organizations: { id: string; name: string; logo_path?:string|null }[];
   org: string;
   userId: string;
+  isAdmin?: boolean;
 }) {
   const {dark,toggle:toggleTheme}=useTheme();
   const ready = useSyncExternalStore(subscribeReady, clientReady, serverReady);
@@ -101,6 +105,7 @@ function Frame({
           <ChevronDown size={14} />
         </button>
         <div className="top-actions">
+          {isAdmin && <Link href={`/workspace/admin?org=${org}`} className="button admin-entry"><ShieldCheck size={18}/>Admin panel</Link>}
           <span
             className="connection-status"
             data-live={live}
@@ -154,6 +159,7 @@ function Frame({
         aria-label="Əsas menyu"
         id="workspace-navigation"
       >
+        {isAdmin && <Link className="mobile-admin-entry" href={`/workspace/admin?org=${org}`} onClick={()=>setOpen(false)}>Admin panel</Link>}
         {modules.map(([id, label]) => (
           <Link
             key={id}

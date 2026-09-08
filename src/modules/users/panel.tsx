@@ -19,7 +19,7 @@ const permissions = [
   "finance.read",
   ...modules.map((m) => m[0] + ".export"),
 ];
-export function Users({ org, data, member, refresh }: PanelProps) {
+export function Users({ org, data, member, refresh, inAdmin = false }: PanelProps & {inAdmin?: boolean}) {
   const [profile,setProfile]=useState<Item|null>(null);
   const [inviteLink, setInviteLink] = useState("");
   const [selected, setSelected] = useState<Item | null>(null),
@@ -29,6 +29,7 @@ export function Users({ org, data, member, refresh }: PanelProps) {
     <>
       <div className="section-toolbar">
         <p className="muted">Komanda, departament və səlahiyyətlər</p>
+        {member.is_admin && !inAdmin && <a className="button" href={`/workspace/admin?org=${org}`}>Admin panel · Müraciətlər və linklər</a>}
         {member.is_admin && (
           <div className="toolbar">
             <button className="primary" onClick={() => setAdd("member")}><Plus size={18}/>Əməkdaş əlavə et</button>

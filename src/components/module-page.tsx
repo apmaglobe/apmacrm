@@ -9,6 +9,7 @@ import { CRM } from "@/modules/crm/board";
 import { Customers } from "@/modules/customers/customers";
 import { Operations } from "@/modules/operations/panels";
 import { Finance } from "@/modules/finance/panel";
+import { AdminPanel } from "@/modules/users/admin-access";
 import { Users } from "@/modules/users/panel";
 import { Subscriptions } from "@/modules/subscriptions/panel";
 export type PanelProps = {
@@ -20,7 +21,7 @@ export type PanelProps = {
   filters?: Record<string,string>;
   setFilters?: (filters:Record<string,string>)=>void;
 };
-export function ModulePage({ module, org }: { module: string; org: string }) {
+export function ModulePage({ module, org, adminMode = false }: { module: string; org: string; adminMode?: boolean }) {
   const [q, setQ] = useState("");
   const [filters,setFilters]=useState<Record<string,string>>({});
   const cache = useQueryClient();
@@ -56,7 +57,7 @@ export function ModulePage({ module, org }: { module: string; org: string }) {
       <div className="page-heading">
         <div>
           <p className="eyebrow">İŞ SAHƏSİ</p>
-          <h1>{modules.find((m) => m[0] === module)?.[1]}</h1>
+          <h1>{adminMode ? "Admin panel" : modules.find((m) => m[0] === module)?.[1]}</h1>
         </div>
         <div className="toolbar">
           <label className="search">
@@ -71,7 +72,7 @@ export function ModulePage({ module, org }: { module: string; org: string }) {
           <button aria-label="Yenilə" className="icon-button" onClick={refresh}>
             <RefreshCw size={17} />
           </button>
-          <Export org={org} module={module} q={q} filters={filters} />
+          {!adminMode && <Export org={org} module={module} q={q} filters={filters} />}
         </div>
       </div>
       {query.isPending ? (
@@ -81,6 +82,8 @@ export function ModulePage({ module, org }: { module: string; org: string }) {
           {query.error.message}
           <button onClick={() => query.refetch()}>Yenidən yoxla</button>
         </div>
+      ) : adminMode ? (
+        <AdminPanel {...props} />
       ) : module === "crm" ? (
         <CRM {...props} />
       ) : module === "map" ? (

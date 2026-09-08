@@ -979,31 +979,43 @@ export type Database = {
       }
       invitations: {
         Row: {
+          accepted_at: string | null
           accepted_by: string | null
           created_at: string
+          created_by: string | null
           email: string
           expires_at: string
           id: string
           organization_id: string
+          revoked_at: string | null
           token_hash: string
+          version: number
         }
         Insert: {
+          accepted_at?: string | null
           accepted_by?: string | null
           created_at?: string
+          created_by?: string | null
           email: string
           expires_at: string
           id?: string
           organization_id: string
+          revoked_at?: string | null
           token_hash: string
+          version?: number
         }
         Update: {
+          accepted_at?: string | null
           accepted_by?: string | null
           created_at?: string
+          created_by?: string | null
           email?: string
           expires_at?: string
           id?: string
           organization_id?: string
+          revoked_at?: string | null
           token_hash?: string
+          version?: number
         }
         Relationships: [
           {
@@ -2408,6 +2420,20 @@ export type Database = {
           name: string
         }[]
       }
+      admin_access_command: {
+        Args: {
+          expected_version: number
+          operation: string
+          org: string
+          payload: Json
+          request_id: string
+        }
+        Returns: Json
+      }
+      admin_access_read: {
+        Args: { org: string; page_offset?: number }
+        Returns: Json
+      }
       board_filtered: {
         Args: {
           cursors: Json
@@ -2428,6 +2454,7 @@ export type Database = {
         Returns: Json
       }
       claim_bootstrap: { Args: never; Returns: string }
+      complete_member: { Args: { job: string; org: string }; Returns: Json }
       crm_command: {
         Args: {
           expected_version: number
@@ -2446,6 +2473,15 @@ export type Database = {
           org: string
           payload: Json
           request_id: string
+        }
+        Returns: Json
+      }
+      export_page: {
+        Args: {
+          job: string
+          org: string
+          part_index?: number
+          row_offset?: number
         }
         Returns: Json
       }
@@ -2491,6 +2527,7 @@ export type Database = {
         Args: { display_name: string; join_token: string }
         Returns: string
       }
+      login_context: { Args: never; Returns: Json }
       monthly_portfolio: { Args: { org: string }; Returns: Json }
       operations_command: {
         Args: {
@@ -2504,6 +2541,10 @@ export type Database = {
       }
       overview_report: {
         Args: { date_from?: string; date_to?: string; org: string }
+        Returns: Json
+      }
+      prepare_member: {
+        Args: { org: string; payload: Json; request_id: string }
         Returns: Json
       }
       price_summary: { Args: { d: string; org: string }; Returns: Json }

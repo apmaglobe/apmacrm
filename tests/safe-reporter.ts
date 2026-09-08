@@ -1,6 +1,6 @@
 import type {Reporter,TestCase,TestResult,FullResult} from '@playwright/test/reporter';
 // Browser request failures can include cookie and deployment-bypass headers even with trace off.
-function safe(value:string){return value.replace(/^.*(?:cookie:|authorization:|x-vercel-protection-bypass:).*$/gim,'[request credential redacted]').replace(/eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token redacted]').replace(/sb_secret_[A-Za-z0-9_-]+/g,'[server key redacted]');}
+function safe(value:string){return value.replace(/\/(?:join|invite)\/[A-Za-z0-9-]+/g,'/[access-link redacted]').replace(/^.*(?:cookie:|authorization:|x-vercel-protection-bypass:).*$/gim,'[request credential redacted]').replace(/eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token redacted]').replace(/sb_secret_[A-Za-z0-9_-]+/g,'[server key redacted]');}
 export default class SafeReporter implements Reporter{
  private passed=0;private failed=0;
  onStdOut(chunk:string|Buffer){process.stdout.write(safe(String(chunk)));}

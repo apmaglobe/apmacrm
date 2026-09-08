@@ -11,7 +11,7 @@ export default async function Page({
   searchParams: Promise<{ org?: string }>;
 }) {
   const { module } = await params;
-  if (!modules.some((m) => m[0] === module)) notFound();
+  if (module !== "admin" && !modules.some((m) => m[0] === module)) notFound();
   const db = await serverClient();
   const {
     data: { user },
@@ -27,6 +27,8 @@ export default async function Page({
     active.find((m) => m.organization_id === requested)?.organization_id ??
     active[0]?.organization_id;
   if (!org) redirect("/login");
+  const isAdmin = active.find((m) => m.organization_id === org)?.is_admin ?? false;
+  if (module === "admin" && !isAdmin) notFound();
   const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
   if (
     active.find((m) => m.organization_id === org)?.is_admin &&
@@ -37,8 +39,8 @@ export default async function Page({
     .from("organizations")
     .select("id,name,logo_path");
   return (
-    <Workspace organizations={organizations ?? []} org={org} userId={user.id}>
-      <ModulePage key={org+module} module={module} org={org} />
+    <Workspace organizations={organizations ?? []} org={org} userId={user.id} isAdmin={isAdmin}>
+      <ModulePage key={org+module} module={module === "admin" ? "users" : module} org={org} adminMode={module === "admin"} />
     </Workspace>
   );
 }
