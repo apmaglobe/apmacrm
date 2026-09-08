@@ -1,0 +1,16 @@
+.local
+.env*
+!.env.example
+private-inputs
+tests
+scripts
+docs
+prompts
+supabase
+*.zip
+CRM-v1.0-tam-paket.md
+AGENTS.md
+README.md
+playwright-report
+test-results
+.git
