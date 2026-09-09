@@ -12,9 +12,8 @@ export function MapView({
   customers: Item[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const key = process.env.NEXT_PUBLIC_GEOAPIFY_KEY;
   useEffect(() => {
-    if (!key || !ref.current) return;
+    if (!ref.current) return;
     let stop = false;
     let map: import("leaflet").Map | undefined;
     (async () => {
@@ -22,12 +21,12 @@ export function MapView({
       await import("leaflet.markercluster");
       if (stop || !ref.current) return;
       map = L.map(ref.current).setView([40.4093, 49.8671], 12);
+      const key = process.env.NEXT_PUBLIC_GEOAPIFY_KEY;
       L.tileLayer(
-        `https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${key}`,
-        {
-          attribution: "Powered by Geoapify | © OpenStreetMap contributors",
-          maxZoom: 20,
-        },
+        key
+          ? `https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${key}`
+          : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        { attribution: key ? "Powered by Geoapify | © OpenStreetMap contributors" : "© OpenStreetMap contributors", maxZoom: 20 },
       ).addTo(map);
       const cluster = L.markerClusterGroup();
       locations
@@ -55,13 +54,6 @@ export function MapView({
       stop = true;
       map?.remove();
     };
-  }, [key, locations, customers]);
-  return key ? (
-    <div className="map" ref={ref} />
-  ) : (
-    <div className="notice">
-      Xəritə üçün Geoapify açarı hələ təyin edilməyib. Müəssisə və koordinat
-      siyahısı işləyir.
-    </div>
-  );
+  }, [locations, customers]);
+  return <div className="map" ref={ref} />;
 }

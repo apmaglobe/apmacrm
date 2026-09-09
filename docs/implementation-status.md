@@ -31,6 +31,8 @@ Public/server env-lər preview və production üçün ayrı bazalara bağlıdır
 
 ## Son düzəlişlər
 
+09.09, HORECA data importu: `baku_horeca_database.xlsx` real sütunları oxundu. 654/654 koordinat etibarlı, 9 təkrarlanan ad fərqli filial ünvanlarıdır. Production APMA tenantinə idempotent `horeca-baku:*` mənbə kodları ilə **645 müəssisə, 654 filial/xəritə nöqtəsi və 654 telefon kontaktı** yazıldı. Geoapify açarı olmadan xəritə OpenStreetMap fonunu göstərir; açar verilərsə Geoapify qatına avtomatik keçir. Production-7 `dpl_7rWS3cLxRU8SSyxBCkwoD1zHV8jz` READY və əsas alias-a bağlıdır.
+
 08.09, UI: `5fc451f` — “Canlı” ayrıca status komponenti ilə topbar ikonlarıyla eyni hündürlükdə və mərkəzdədir. Axtarış form label-in şaquli düzülüşündən ayrılıb: ikon/mətn üfüqi, 44px hündürlük, focus göstəricisi. Qutu filtrləri 58px yığcam ikonlu başlıq, açılma oxu, hover/focus və native klaviatura idarəsi ilə yenilənib. 1440/390/360px, ağ/qara tema, axtarış/filtr HTTP200: lokal və preview-13 hərəsində 7 hədəf yoxlaması keçib; 0 page error. Yeni migration yoxdur.
 
 19–24 migration: Overview/report/gündəlik xülasə; təsviri quantity və giriş verməyən mentions; export filter uyğunluğu; shared To Do scope; Meet əlaqələri; recurring failed-job backoff; yaranmamış failed dövr planının səbəbli, atomik, idempotent bərpası; export source revalidation-da UUID index lookup.
