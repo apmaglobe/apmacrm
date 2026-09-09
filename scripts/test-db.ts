@@ -161,9 +161,9 @@ try {
     assert.equal(row.accountable_id,mO);
     assert.equal(row.mediator_id,mM);
     const mine=await as(member,"select name from public.todo_items($1,'mine','',0)",[orgA]);
-    assert(mine.some((item)=>item.name==="Çəkiliş"));
+    assert(!mine.some((item)=>item.name==="Çəkiliş"));
     const shared=await as(member,"select name from public.todo_items($1,'shared','',0)",[orgA]);
-    assert(shared.some((item)=>item.name==="Meta Manager"));
+    assert(!shared.some((item)=>item.name==="Meta Manager"));
     await assert.rejects(command(member,"deal.update",{deal_id:multi.id,title:"Unauthorized"},row.version),/EDIT_DENIED/);
   });
   const rid = randomUUID();
@@ -255,6 +255,10 @@ try {
     { deal_id: deal.id, stage: "confirmed" },
     deal.version,
   );
+  await check("sales work reaches To Do only after confirmation", async () => {
+    const mine = await as(member, "select name from public.todo_items($1,'mine','',0)", [orgA]);
+    assert(mine.some((item) => item.name === "Dizayn"));
+  });
   await check("AC-45 one charge on confirmed/delivered", async () => {
     deal = await command(
       member,
