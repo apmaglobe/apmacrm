@@ -17,6 +17,9 @@ export function Login() {
     const {data:{user}} = await db.auth.getUser();
     if (!user) {setSigned(false);setMode("login");return;}
     setSigned(true);setEmail(user.email??"");
+    if(new URLSearchParams(window.location.search).get("recovery")==="1"){
+      setMode("password");return;
+    }
     const [{data,error},assurance,factors] = await Promise.all([
       db.rpc("login_context"),db.auth.mfa.getAuthenticatorAssuranceLevel(),db.auth.mfa.listFactors(),
     ]);
@@ -43,6 +46,7 @@ export function Login() {
     const {data}=db.auth.onAuthStateChange((event)=>{
       // Supabase emits this callback while holding its auth lock; resolve outside that lock.
       if(event==="INITIAL_SESSION")timer=setTimeout(()=>{void resolve().catch(()=>{setMode("login");setMessage("Hesabın vəziyyəti yüklənmədi. Yenidən daxil olun.");});},0);
+      if(event==="PASSWORD_RECOVERY"){setSigned(true);setMode("password");}
       if(event==="SIGNED_OUT"){setSigned(false);setMode("login");setQr("");}
     });
     return ()=>{clearTimeout(timer);data.subscription.unsubscribe();};
@@ -61,10 +65,10 @@ export function Login() {
         const {error}=await db.auth.signUp({email:inputEmail,password,options:{emailRedirectTo:location.origin+"/auth/callback"}});
         if(error)throw error;setMessage("Email ünvanınıza göndərilən təsdiq keçidini açın.");
       }else if(mode==="reset"){
-        const {error}=await db.auth.resetPasswordForEmail(inputEmail,{redirectTo:location.origin+"/auth/callback"});
+        const {error}=await db.auth.resetPasswordForEmail(inputEmail,{redirectTo:location.origin+"/auth/callback?flow=recovery"});
         if(error)throw error;setMessage("Ünvan uyğun olarsa, şifrə yeniləmə keçidi göndəriləcək.");
       }else if(mode==="password"){
-        const {error}=await db.auth.updateUser({password});if(error)throw error;setMessage("Şifrə yeniləndi.");
+        const {error}=await db.auth.updateUser({password});if(error)throw error;window.history.replaceState({},"","/login");setMessage("Şifrə yeniləndi.");
       }else if(mode==="mfa"){
         const {error}=await db.auth.mfa.challengeAndVerify({factorId:factor,code:String(form.get("code"))});
         if(error){setMessage("Təsdiq kodu qəbul edilmədi. Authenticator tətbiqindəki cari 6 rəqəmli kodu yazın.");return;}

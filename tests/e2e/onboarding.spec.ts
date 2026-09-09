@@ -26,3 +26,8 @@ test('unapproved account stays on a clear pending screen without a login/workspa
  await passwordLogin(page,1);await expect(page.getByRole('heading',{name:'Üzvlük təsdiqi gözlənilir',exact:true})).toBeVisible();await expect(page.getByLabel('Şifrə',{exact:true})).toHaveCount(0);await expect(page.getByRole('button',{name:'İlk admini aktivləşdir',exact:true})).toHaveCount(0);
  await page.goto('/workspace/crm');await expect(page).toHaveURL(/\/login$/);await expect(page.getByRole('heading',{name:'Üzvlük təsdiqi gözlənilir',exact:true})).toBeVisible();await page.reload();await expect(page.getByRole('heading',{name:'Üzvlük təsdiqi gözlənilir',exact:true})).toBeVisible();
 });
+test('recovery session opens the password form, not the regular workspace entrance',async({page})=>{
+ await passwordLogin(page,1);await expect(page.getByRole('heading',{name:'Üzvlük təsdiqi gözlənilir',exact:true})).toBeVisible();
+ await page.goto('/login?recovery=1');await expect(page.getByRole('heading',{name:'Yeni şifrə',exact:true})).toBeVisible();
+ await expect(page.getByLabel('Email',{exact:true})).toHaveCount(0);await expect(page.getByLabel('Şifrə',{exact:true})).toBeVisible();
+});
