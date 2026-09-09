@@ -1,5 +1,5 @@
 "use client";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { browserClient } from "@/lib/auth/browser";
 import { useState } from "react";
 import dynamic from "next/dynamic";
@@ -72,11 +72,21 @@ export function Customers({
       ]),
     ),
   };
+  const [showMap, setShowMap] = useState(false);
+
+  const mapData = useQuery({
+    queryKey: ["workspace", org, "customer-map-points"],
+    enabled: showMap,
+    queryFn: async () => {
+      const response = await fetch(`/api/data?org=${org}&module=map&all_locations=1`);
+      if (!response.ok) throw new Error("Xəritə nöqtələri yüklənmədi");
+      return response.json() as Promise<{ customers: Item[]; locations: Item[] }>;
+    },
+  });
 
   const [importOpen, setImportOpen] = useState(false),
     [pin, setPin] = useState<Item | null>(null),
     [edit, setEdit] = useState<Item | null>(null),
-    [showMap, setShowMap] = useState(false),
     [rollback, setRollback] = useState<Item | null>(null);
   return (
     <>
@@ -99,8 +109,8 @@ export function Customers({
       </div>
       {showMap && (
         <MapView
-          locations={data.customer_locations ?? []}
-          customers={data.customers ?? []}
+          locations={mapData.data?.locations ?? []}
+          customers={mapData.data?.customers ?? []}
         />
       )}
       <div className="customer-grid">

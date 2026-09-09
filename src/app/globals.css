@@ -936,6 +936,7 @@ table select {
 }
 .map-pin {
   background: transparent;
+  border: 0;
 }
 .map-pin span {
   display: block;

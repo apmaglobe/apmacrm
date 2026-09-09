@@ -21,12 +21,9 @@ export function MapView({
       await import("leaflet.markercluster");
       if (stop || !ref.current) return;
       map = L.map(ref.current).setView([40.4093, 49.8671], 12);
-      const key = process.env.NEXT_PUBLIC_GEOAPIFY_KEY;
       L.tileLayer(
-        key
-          ? `https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${key}`
-          : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        { attribution: key ? "Powered by Geoapify | © OpenStreetMap contributors" : "© OpenStreetMap contributors © CARTO", maxZoom: 20 },
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        { attribution: "© OpenStreetMap contributors © CARTO", maxZoom: 20 },
       ).addTo(map);
       L.control.scale({ imperial: false, position: "bottomleft" }).addTo(map);
       const cluster = L.markerClusterGroup({

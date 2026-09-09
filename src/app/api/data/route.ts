@@ -59,6 +59,22 @@ export async function GET(req: NextRequest) {
   const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
   if (!member || (member.is_admin && aal.data?.currentLevel !== "aal2"))
     return NextResponse.json({ error: "ACCESS_DENIED" }, { status: 403 });
+  if (section === "map" && req.nextUrl.searchParams.get("all_locations") === "1") {
+    const customers = await db
+      .from("customers")
+      .select("id,name")
+      .eq("organization_id", org)
+      .eq("archived", false)
+      .order("name")
+      .limit(2500);
+    if (customers.error) return NextResponse.json({ error: "CUSTOMERS_FAILED" }, { status: 400 });
+    const ids = customers.data.map((customer) => customer.id);
+    const locations = ids.length
+      ? await db.from("customer_locations").select("id,customer_id,address,latitude,longitude").eq("organization_id", org).in("customer_id", ids).not("latitude", "is", null).not("longitude", "is", null).limit(5000)
+      : { data: [], error: null };
+    if (locations.error) return NextResponse.json({ error: "LOCATIONS_FAILED" }, { status: 400 });
+    return NextResponse.json({ customers: customers.data, locations: locations.data }, { headers: { "Cache-Control": "private, no-store" } });
+  }
   if(section==="users"&&req.nextUrl.searchParams.get("activity")) {
     const target=req.nextUrl.searchParams.get("activity");
     const memberResult=await db.from("memberships").select("id,user_id,name").eq("organization_id",org).eq("id",target).maybeSingle();
