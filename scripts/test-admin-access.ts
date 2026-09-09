@@ -38,7 +38,9 @@ try{
  let pending:string;
  await check('join replay/concurrency creates one pending request and source use',async()=>{
   const l=await link(general!);const mids=await Promise.all([join(newUser,l.token),join(newUser,l.token)]);assert.equal(mids[0],mids[1]);pending=mids[0];
-  const r=await read();assert.equal(r.requests.find((x:{id:string})=>x.id===pending).decision,'pending');assert.equal((await link(general!)).uses,1);
+ const r=await read();assert.equal(r.requests.find((x:{id:string})=>x.id===pending).decision,'pending');assert.equal((await link(general!)).uses,1);
+  const notices=await db.query("select event_key,label from public.notifications where organization_id=$1 and recipient_id=(select id from public.memberships where organization_id=$1 and user_id=$2)",[org,admin]);
+  assert.deepEqual(notices.rows,[{event_key:`membership-request:${pending}`,label:'Yeni qoşulma müraciəti'}]);
   assert.equal((await as(newUser,'select count(*)::int n from public.customers where organization_id=$1',[org]))[0].n,0);
   await assert.rejects(read(newUser),/ADMIN_REQUIRED/);
  });
@@ -64,6 +66,7 @@ try{
   const id=(await cmd('link.create',{kind:'email',email:invited+'@example.test',days:7})).id,l=await link(id);
   await assert.rejects(as(newUser,'select public.invite_accept($1,$2)',[l.token,'Wrong']),/INVALID_INVITATION/);
   const a=await as(invited,'select public.invite_accept($1,$2) id',[l.token,'Invited']);const b=await as(invited,'select public.invite_accept($1,$2) id',[l.token,'Invited']);assert.equal(a[0].id,b[0].id);
+  const notice=await db.query("select event_key from public.notifications where organization_id=$1 and recipient_id=(select id from public.memberships where organization_id=$1 and user_id=$2) and event_key=$3",[org,admin,`membership-request:${a[0].id}`]);assert.equal(notice.rowCount,1);
   const now=await link(id);assert.equal(now.uses,1);assert.equal(now.status,'accepted');assert.ok(now.accepted_at);await assert.rejects(cmd('link.renew',{id,kind:'email',days:7},now.version),/INVITATION_USED/);
  });
  await check('email renewal/revocation and stale versions enforce lifecycle',async()=>{

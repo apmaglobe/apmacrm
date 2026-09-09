@@ -89,4 +89,6 @@ Son tələb tamamlandı: topbar “Canlı”, axtarış və filtr üslubu `5fc45
 
 ## Lokal davam
 
+10.09 dəvət müraciəti bildirişi düzəldildi: ümumi qoşulma və emailə bağlı fərdi dəvət qəbul ediləndə hər aktiv admin üçün tenant-izolyasiyalı in-app bildiriş yaranır. Açıq admin panel mövcud Realtime invalidation ilə müraciət siyahısını yeniləyir və yeni pending müraciət artdıqda ekranda təsdiq mesajı göstərir. Lokal migration tətbiq edilib; admin access DB yoxlaması 10/10, typecheck və build keçib. Migration production Supabase-ə tətbiq olunub, Vercel deployment `dpl_AXp3ZkC8sNtzxPeT6Ese9XyHjP1a` READY-dir; əsas URL `/login` HTTP 200 cavab verir.
+
 PATH: `/opt/homebrew/bin:/Users/rafaelaghazade/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin`. Colima `apma-crm`, Docker `~/.colima/apma-crm/docker.sock`; lokal API54321/DB54322/Next3000. Restore API55321/DB55322. Build ilə server eyni `.next`-ə paralel yazmamalıdır. `.env.local` yalnız lokal bazadır. `.local/fixture.json`, `.local/preview-fixture.json`, cloud-connection və backup key ignored/private-dir; çıxışa verməyin.

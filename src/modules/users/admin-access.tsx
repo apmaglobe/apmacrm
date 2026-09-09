@@ -1,5 +1,5 @@
 "use client";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {Check, Copy, Link2, Mail, Plus, RefreshCw, ShieldCheck, UserRoundCheck, X} from "lucide-react";
@@ -37,6 +37,7 @@ function AccessManager({org,refresh,q}:PanelProps){
  const [error,setError]=useState("");
  const [busy,setBusy]=useState<string|null>(null);
  const ids=useRef(new Map<string,string>());
+ const previousPending=useRef<number|null>(null);
  const query=useInfiniteQuery({queryKey:["workspace",org,"admin-access"],initialPageParam:0,
   queryFn:async({pageParam})=>{const r=await browserClient().rpc("admin_access_read",{org,page_offset:pageParam});if(r.error)throw Error(errors[r.error.message]??"Admin məlumatları yüklənmədi.");return r.data as AccessData;},
   getNextPageParam:(last,pages)=>last.links.length>100||last.requests.length>100?pages.length*100:undefined,refetchInterval:30000});
@@ -44,6 +45,15 @@ function AccessManager({org,refresh,q}:PanelProps){
  const links=pages.flatMap(p=>p.links.slice(0,100));
  const requests=pages.flatMap(p=>p.requests.slice(0,100));
  const counts=pages[0]?.counts;
+ const pendingCount=counts?.pending;
+ useEffect(()=>{
+  if(pendingCount===undefined)return;
+  if(previousPending.current!==null&&pendingCount>previousPending.current){
+   setMessage("Yeni qoşulma müraciəti gəldi. Təsdiq üçün siyahıda görünür.");
+   setError("");
+  }
+  previousPending.current=pendingCount;
+ },[pendingCount]);
  async function mutate(operation:string,payload:Record<string,unknown>,version:number,requestId:string){
   const r=await browserClient().rpc("admin_access_command",{org,operation,payload,expected_version:version,request_id:requestId});
   if(r.error)throw Error(errors[r.error.message]??"Əməliyyat tamamlanmadı. Məlumatları yoxlayıb yenidən sınayın.");
