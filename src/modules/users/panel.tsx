@@ -6,7 +6,7 @@ import { Settings } from "./settings";
 import { Webhooks } from "./webhooks";
 import { browserClient } from "@/lib/auth/browser";
 import { useState } from "react";
-import { Plus, Shield } from "lucide-react";
+import { Check, Copy, Plus, Shield } from "lucide-react";
 import type { PanelProps } from "@/components/module-page";
 import type { Item } from "@/lib/db/types";
 import { Modal } from "@/components/dialog";
@@ -22,6 +22,7 @@ const permissions = [
 export function Users({ org, data, member, refresh, inAdmin = false }: PanelProps & {inAdmin?: boolean}) {
   const [profile,setProfile]=useState<Item|null>(null);
   const [inviteLink, setInviteLink] = useState("");
+  const [inviteCopied, setInviteCopied] = useState(false);
   const [selected, setSelected] = useState<Item | null>(null),
     [add, setAdd] = useState(""),
     [role, setRole] = useState<Item | null>(null);
@@ -48,6 +49,7 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
           onClose={() => {
             setAdd("");
             setInviteLink("");
+            setInviteCopied(false);
           }}
         >
           <Form
@@ -59,6 +61,7 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
               );
               if (error) throw new Error("Dəvət yaradıla bilmədi");
               setInviteLink(location.origin + "/invite/" + data);
+              setInviteCopied(false);
             }}
           >
             <Field
@@ -69,10 +72,36 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
             />
           </Form>
           {inviteLink && (
-            <p className="notice">
-              7 gün ərzində yalnız bu email ilə qəbul olunur; sonra admin
-              təsdiqi lazımdır. <a href={inviteLink}>{inviteLink}</a>
-            </p>
+            <div className="notice invite-link-result" role="status">
+              <span>
+                7 gün ərzində yalnız bu email ilə qəbul olunur; sonra admin
+                təsdiqi lazımdır. <a href={inviteLink}>{inviteLink}</a>
+              </span>
+              <button
+                type="button"
+                className="invite-copy-button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(inviteLink);
+                    setInviteCopied(true);
+                  } catch {
+                    const input = document.createElement("textarea");
+                    input.value = inviteLink;
+                    input.setAttribute("readonly", "");
+                    input.style.position = "fixed";
+                    input.style.opacity = "0";
+                    document.body.append(input);
+                    input.select();
+                    const copied = document.execCommand("copy");
+                    input.remove();
+                    if (copied) setInviteCopied(true);
+                  }
+                }}
+              >
+                {inviteCopied ? <Check size={16} /> : <Copy size={16} />}
+                {inviteCopied ? "Kopyalandı" : "Kopyala"}
+              </button>
+            </div>
           )}
         </Modal>
       )}

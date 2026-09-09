@@ -1468,3 +1468,10 @@ table select {
 }
 
 .admin-section .empty { min-height: 96px; padding: 24px; }
+
+.invite-link-result { display: flex; align-items: flex-start; gap: 12px; }
+.invite-link-result > span { min-width: 0; overflow-wrap: anywhere; }
+.invite-copy-button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+@media(max-width:560px) {
+ .invite-link-result { flex-direction: column; }
+}

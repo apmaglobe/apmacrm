@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       },
       {
         status:
-          error.code === "40001" ? 409 : error.code === "42501" ? 403 : 400,
+          ["40001", "PT409"].includes(error.code) ? 409 : error.code === "42501" ? 403 : 400,
       },
     );
   }

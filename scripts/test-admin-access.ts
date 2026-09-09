@@ -43,7 +43,7 @@ try{
   await assert.rejects(read(newUser),/ADMIN_REQUIRED/);
  });
  await check('approval is versioned, retry-safe and cannot target another tenant',async()=>{
-  const request=randomUUID();await assert.rejects(cmd('request.approve',{id:pending},99),/VERSION_CONFLICT/);
+  const request=randomUUID();await assert.rejects(cmd('request.approve',{id:pending},99),(e:unknown)=>{assert.equal((e as {code:string}).code,'PT409');return /VERSION_CONFLICT/.test(String(e));});
   await assert.rejects(cmd('request.approve',{id:pending},1,randomUUID(),otherAdmin,foreign),/NOT_FOUND/);
   await cmd('request.approve',{id:pending},1,request);await cmd('request.approve',{id:pending},1,request);
   const m=(await db.query('select status,version from public.memberships where id=$1',[pending])).rows[0];assert.equal(m.status,'active');assert.equal(Number(m.version),2);

@@ -10,7 +10,7 @@ import { command } from "@/lib/db/api";
 import { cents } from "@/lib/domain";
 export function Subscriptions({ org, data, member, refresh }: PanelProps) {
   const [add, setAdd] = useState(false),
-    [selected, setSelected] = useState<{ c: Item; op: string } | null>(null),
+    [selected, setSelected] = useState<{ id: string; op: string } | null>(null),
     [count, setCount] = useState(1),
     [error, setError] = useState(""),
     [repair,setRepair]=useState<Item|null>(null),
@@ -21,6 +21,9 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
         .sort((a, b) => b.version - a.version)[0]
     : null;
   const template = revision?.settings.works ?? [];
+  const selectedContract = selected
+    ? data.service_contracts?.find((contract) => contract.id === selected.id)
+    : null;
   if (!member.is_admin)
     return (
       <div className="empty">
@@ -76,12 +79,12 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
               {c.status === "active" ? (
                 <>
                   <button
-                    onClick={() => setSelected({ c, op: "contract.pause" })}
+                    onClick={() => setSelected({ id: c.id, op: "contract.pause" })}
                   >
                     Fasilə ver
                   </button>
                   <button
-                    onClick={() => setSelected({ c, op: "contract.stop" })}
+                    onClick={() => setSelected({ id: c.id, op: "contract.stop" })}
                   >
                     Dayandır
                   </button>
@@ -106,7 +109,7 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
                 </>
               ) : (
                 <button
-                  onClick={() => setSelected({ c, op: "contract.resume" })}
+                  onClick={() => setSelected({ id: c.id, op: "contract.resume" })}
                 >
                   Yenidən başlat
                 </button>
@@ -308,7 +311,7 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
           </Form>
         </Modal>
       )}
-      {selected && (
+      {selected && selectedContract && (
         <Modal title="Müqavilənin vəziyyəti" onClose={() => setSelected(null)}>
           <Form
             onSave={async (f) => {
@@ -317,11 +320,11 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
                 "subscription",
                 selected.op,
                 {
-                  id: selected.c.id,
+                  id: selectedContract.id,
                   reason: f.get("reason"),
                   service_last_day: f.get("service_last_day") || null,
                 },
-                selected.c.version,
+                selectedContract.version,
               );
               await refresh();
               setSelected(null);

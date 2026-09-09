@@ -88,3 +88,20 @@ Backup zamanı tətbiq yazmaları dayandırılmalı və ya DB/Storage üçün ko
 - Realtime «Bağlanır…»: şəbəkə/token və Supabase Realtime statusu. Reconnect bazadan təzə məlumat alır.
 - Export/import failed: job metadata və sanitize edilmiş xətanı yoxlayın. Faylı və secretləri loga çıxarmayın.
 - Vercel 404: faktiki alias və deployment statusunu oxuyun; nəzərdə tutulan domeni hazır URL kimi verməyin.
+
+
+## Ümumi admin panel — müraciətlər və linklər
+
+`/workspace/admin` yalnız seçilmiş agentliyin aktiv, TOTP təsdiqli admininə açılır. Desktop-da yuxarı sağdakı **Admin panel**, mobil menyuda **Admin panel** seçin.
+
+1. **Link yarat** → ümumi qoşulma (ad verin) və ya emailə bağlı dəvət → 1/7/30 gün → **Saxla**.
+2. Siyahıdan **Kopyala** ilə ünvanı alın və əməkdaşa özünüz göndərin. Avtomatik email göndərilmir.
+3. Əməkdaş öz təsdiqlənmiş hesabına daxil olduğu brauzerdə linki açır və **Qoşulma müraciəti** göndərir. Adi qeydiyyat özü agentliyə aid müraciət yaratmır.
+4. Müraciət **Qoşulma müraciətləri** hissəsinə gəlir. **Təsdiqlə** əsas üzvlüyü açır; **Rədd et** səbəb tələb edir. Departament/rol/fərdi hüquqlar **Komanda və parametrlər** → əməkdaş → **İdarə et** ilə təyin olunur.
+5. Əməkdaş login ekranında **Vəziyyəti yenilə** seçir. Təsdiqlənmiş üzvlüklə CRM-ə daxil ola bilər.
+
+Link vəziyyətləri: Aktiv, Müddəti bitib, Ləğv edilib, İstifadə edilib. Email dəvəti bir hesaba bağlıdır; ümumi link çox əməkdaşın pending müraciətinə imkan verir. Müddətlər UTC saxlanır, tarixlər Bakı vaxtı ilə göstərilir. Ümumi link istifadə sayı bu linkdən qeydə alınmış unikal müraciətlərdir; migration-dan əvvəl mənbəsi bilinməyən müraciətlərə link attribution uydurulmur. Yenilə yeni ünvan yaradır və əvvəlkini bağlayır. Ləğv yeni müraciətləri dayandırır, mövcud üzvlüklərə toxunmur. Artıq istifadə edilmiş email dəvəti yenilənmir; yeni dəvət yaradın.
+
+Tarixçə silinmir. Bir əməkdaş sonradan dayandırıldıqda əvvəlki təsdiq qərarı tarixçədə saxlanır. Müraciət/link filtrləri ünvanın parametrində saxlanır; Realtime yenilənmə seçimi sıfırlamır. Siyahılar 100 sətirlik səhifələrlə yüklənir.
+
+Bu hissənin DB yoxlaması `pnpm test:admin-db`. Sintetik brauzer müraciətçiləri yalnız local/preview üçün `pnpm exec tsx scripts/access-fixture.ts` (preview üçün `APMA_AUTH_TEST_TARGET=preview`) ilə yaradılır. Private fixture yolunu `APMA_ACCESS_FIXTURE_FILE` ilə Playwright-a ötürün; credential faylını açıq paylaşmayın. Production-da fixture yaratmayın.

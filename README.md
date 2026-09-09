@@ -27,6 +27,7 @@ pnpm typecheck
 pnpm lint
 pnpm test
 pnpm test:db
+pnpm test:admin-db
 pnpm test:e2e
 pnpm build
 ```
@@ -42,6 +43,12 @@ pnpm exec tsx scripts/install-backup-agent.ts
 ```
 
 Benchmark 15 sintetik Auth hesabı, 2 500 müəssisə, 10 000 qutu və 40 000 iş ilə lokal HTTP nəticələri verir; production/Bakı şəbəkəsi ölçməsi deyil. Restore yalnız ayrılmış 55321/55322 hədəfinə işləyir. Ətraflı məhdudiyyətlər runbook-dadır.
+
+## Admin panel
+
+Admin hesabında yuxarı sağdakı **Admin panel** keçidi və ya `/workspace/admin`; mobil menyuda eyni keçid var. **Müraciətlər və linklər** bölməsində ümumi/emailə bağlı link yaratma, 1/7/30 günlük müddət, bitmə vaxtı, kopyalama, yeniləmə/ləğv, müraciət təsdiqi və səbəbli rədd var. Userlər → **Dəvət keçidi** pəncərəsində də yaradılan URL-in yanında **Kopyala** düyməsi görünür. Komanda, rollar və digər ayarlar **Komanda və parametrlər** bölməsindədir. Təsdiqlənmə iş sahəsinə əsas girişi açır; departament və əlavə hüquqları admin komanda bölməsində təyin edir.
+
+Özü qeydiyyatdan keçən hesab yalnız agentliyin qoşulma/dəvət linkindən müraciət etdikdən sonra həmin panelə düşür. Bütün agentliklərin istifadəçilərindən ibarət açıq siyahı yoxdur. Link yeniləmə əvvəlki ünvanı etibarsız edir; ləğv əvvəlki üzvlükləri silmir. Köhnə email linkləri hash kimi saxlandığından onların ünvanını yenidən almaq üçün yeniləmə lazımdır. İlkin ümumi linkin əvvəlki müddətsiz rejimi qorunur; yeni linklər seçilmiş müddətə malikdir.
 
 ## Quruluş
 

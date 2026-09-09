@@ -2,6 +2,12 @@
 
 08.09.2026. Test hesabları və müəssisələr sintetikdir. Bu nəticələr bütün AC cümlələrinin production-da təsdiqlənməsi demək deyil. Bəndlər üzrə sübut və sərhəd [qəbul matrisində](acceptance-matrix.md) göstərilib.
 
+## Admin panel və dəvət linki — 09.09
+
+Lokal `pnpm test:admin-db` **10/10**, mövcud `pnpm test:db` **41/41** keçib. `pnpm typecheck` və `pnpm build` keçib; ESLint **0 error / 2 mövcud login navigation warning** verdi. Köhnə Userlər → Dəvət keçidi pəncərəsində link yaradılıb, **Kopyala** ilə clipboard-a yazılması lokal Playwright testində keçib. Preview-17-də təmiz iki sintetik agentliklə köhnə dəvət/kopyalama və aylıq create → generation → revision → stop axını **2/2**, ayrıca yeni admin paneldə ümumi/email linki, Realtime müraciət, təsdiq/rədd, yeniləmə/ləğv və mobil görünüş **2/2** keçib. Sübut: `.local/db-admin33.log`, `.local/db33-full.log`, `.local/vercel-preview-17.log`.
+
+Production-4 `dpl_14Mh2sbMLkAxw1h2utJYAacoUNTy` READY-dir və [əsas URL](https://apma-crm.vercel.app)-ə bağlıdır. Login HTTP200 və yayımlanmış deployment yoxlanıb; son 15 dəqiqənin runtime logunda yalnız həmin login sorğusu var, xəta yoxdur (`.local/production4-runtime.log`). Production-da istifadəçinin MFA kodu ilə iş sahəsi sınağı aparılmayıb; funksional browser sübutları preview-yə aiddir. Supabase security advisor production və preview-də yalnız Free plandakı leaked-password protection WARN-ını qaytarır; performance advisor-da WARN/ERROR yoxdur, yalnız az istifadə olunan indeks INFO-ları var.
+
 ## Son UI düzəlişi — 08.09, `5fc451f`
 
 Build və TypeScript keçib (`.local/build-ui31.log`, `.local/type-ui31.log`). ESLint 0 error, əvvəlki 2 login hard-navigation warning saxlanır (`.local/lint-ui31.log`). Yeni biznes/DB dəyişikliyi yoxdur; geniş DB və funksional suite bu kosmetik dəyişiklik üçün təkrar işlədilməyib.
