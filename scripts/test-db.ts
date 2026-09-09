@@ -153,14 +153,18 @@ try {
     );
     const created=await as<{result:{id:string;created:boolean} }>(admin,"select public.customer_create($1,$2,$3,$4,$5) result",[orgA,"Bravo Market","Retail","Yeni qutu",randomUUID()]);
     assert.equal(created[0].result.created,true);
-    const multi=await command(admin,"deal.create",{customer_id:created[0].result.id,accountable_id:mO,works:[
+    const multi=await command(admin,"deal.create",{customer_id:created[0].result.id,accountable_id:mO,mediator_id:mM,works:[
       {name:"Çəkiliş",department_id:depts[0].id,assignee_id:mM,amount:null},
       {name:"Meta Manager",department_id:depts[1].id,assignee_id:mO,amount:null},
     ]});
-    const row=(await pool.query("select accountable_id from public.deals where id=$1",[multi.id])).rows[0];
+    const row=(await pool.query("select accountable_id,mediator_id,version from public.deals where id=$1",[multi.id])).rows[0];
     assert.equal(row.accountable_id,mO);
+    assert.equal(row.mediator_id,mM);
     const mine=await as(member,"select name from public.todo_items($1,'mine','',0)",[orgA]);
     assert(mine.some((item)=>item.name==="Çəkiliş"));
+    const shared=await as(member,"select name from public.todo_items($1,'shared','',0)",[orgA]);
+    assert(shared.some((item)=>item.name==="Meta Manager"));
+    await assert.rejects(command(member,"deal.update",{deal_id:multi.id,title:"Unauthorized"},row.version),/EDIT_DENIED/);
   });
   const rid = randomUUID();
   const payload = {

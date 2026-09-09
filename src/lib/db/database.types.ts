@@ -561,6 +561,7 @@ export type Database = {
           intake_department_id: string | null
           location_id: string | null
           loss_reason_id: string | null
+          mediator_id: string | null
           open_work_snapshot: string[]
           organization_id: string
           pipeline: string
@@ -587,6 +588,7 @@ export type Database = {
           intake_department_id?: string | null
           location_id?: string | null
           loss_reason_id?: string | null
+          mediator_id?: string | null
           open_work_snapshot?: string[]
           organization_id: string
           pipeline?: string
@@ -613,6 +615,7 @@ export type Database = {
           intake_department_id?: string | null
           location_id?: string | null
           loss_reason_id?: string | null
+          mediator_id?: string | null
           open_work_snapshot?: string[]
           organization_id?: string
           pipeline?: string
@@ -671,6 +674,13 @@ export type Database = {
             columns: ["organization_id", "loss_reason_id"]
             isOneToOne: false
             referencedRelation: "loss_reasons"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "deals_organization_id_mediator_id_fkey"
+            columns: ["organization_id", "mediator_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
             referencedColumns: ["organization_id", "id"]
           },
           {
@@ -2617,7 +2627,6 @@ export type Database = {
     }
   }
 }
-
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]

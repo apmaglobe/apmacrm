@@ -51,6 +51,7 @@ export type Item = {
   assignee_id: string;
   created_by: string;
   accountable_id: string;
+  mediator_id: string;
   role_id: string;
   user_id: string;
   member_id: string;

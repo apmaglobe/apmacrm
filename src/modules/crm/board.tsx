@@ -282,6 +282,7 @@ export function CRM(props: PanelProps) {
                 customer_id: f.get("customer_id"),
                 due_at: utc(f.get("due_at")),
                 accountable_id: f.get("accountable_id"),
+                mediator_id: f.get("mediator_id"),
                 works: Array.from({length:initialWorkCount},(_,index)=>({
                   quantity: Number(f.get(`quantity_${index}`)||1),
                   name: f.get(`work_name_${index}`),
@@ -310,6 +311,12 @@ export function CRM(props: PanelProps) {
               value={member.id}
               required
             />
+            <Select
+              name="mediator_id"
+              label="Vasitəçi (satış əlaqələndiricisi)"
+              options={data.memberships?.filter((m) => m.status === "active") ?? []}
+            />
+            <p className="helper">Vasitəçi qutunu, tarixçəni və ortaq To Do-nu görür; iş və ödənişləri dəyişə bilmir.</p>
             <h3>İşlər</h3>
             <p className="helper">Hər işi ayrıca əməkdaşa təyin edin. Təyin edilən iş həmin əməkdaşın To Do siyahısında görünəcək.</p>
             {Array.from({length:initialWorkCount},(_,index)=><fieldset key={index}><legend>İş {index+1}</legend>
@@ -738,6 +745,7 @@ export function DealDetail({
                     ...(!d.first_confirmed_at?{customer_id:f.get("customer_id")}:{}),
                     archived:f.get("archived")==="on",
                     accountable_id: f.get("accountable_id"),
+                    mediator_id: f.get("mediator_id"),
                     due_at: utc(f.get("due_at")),
                     zero_reason: f.get("zero_reason"),
                     reason: f.get("reason"),
@@ -756,6 +764,12 @@ export function DealDetail({
                     refs.memberships?.filter((m) => m.status === "active") ?? []
                   }
                   required
+                />
+                <Select
+                  name="mediator_id"
+                  label="Vasitəçi (satış əlaqələndiricisi)"
+                  value={d.mediator_id}
+                  options={refs.memberships?.filter((m) => m.status === "active") ?? []}
                 />
                 <Field
                   name="due_at"

@@ -12,6 +12,10 @@ Production-4 `dpl_14Mh2sbMLkAxw1h2utJYAacoUNTy` READY-dir və [əsas URL](https:
 
 Lokal DB **42/42** və admin DB **10/10** keçib. Yeni Playwright ssenarisi adminin siyahıda olmayan müəssisəni yaratmasını, qutunun cavabdehini seçməsini, iki işi fərqli əməkdaşlara təyin etməsini və təyin olunan əməkdaşın To Do görünüşünü **1/1** keçib. Eyni ssenari preview-18-də də **1/1** keçib (`tests/e2e/deal-creation.spec.ts`, `.local/vercel-preview-18.log`). Production-5 `dpl_14GDt596duinMETA2Kc1G65x1nw2` READY-dir və əsas URL-ə bağlıdır. Production iş sahəsi MFA səbəbilə avtomatlaşdırılmış funksional testdən keçirilməyib.
 
+## Vasitəçi qutu girişi — 09.09
+
+`mediator_id` tenant-ə bağlı aktiv əməkdaşla yoxlanır. Vasitəçi qutunu və tarixçəni oxuya, həmin qutunun işlərini **Ortaq sifarişlər** To Do görünüşündə görə bilir; qutunu, işi, qiyməti və ödənişi dəyişə bilmir. Lokal `pnpm test:db` **42/42**, `pnpm test:admin-db` **10/10**, TypeScript və production build keçib; ESLint **0 error / 2 əvvəlki login warning** verdi. Preview-19 `https://apma-mxbgfaqa5-apmaglobe.vercel.app` üzərində yeni müəssisə → qutu cavabdehi + vasitəçi → iki iş → icraçının öz To Do-su və vasitəçinin ortaq To Do-su ssenarisi **1/1** keçib. Production-6 `dpl_YLvHDPgkckmNR2PGEJfV96JSnVB1` READY-dir, əsas URL-ə bağlıdır və login HTTP200 qaytarır. Production browser sınağı MFA tələb etdiyindən preview nəticəsi ilə əvəz edilmir.
+
 ## Son UI düzəlişi — 08.09, `5fc451f`
 
 Build və TypeScript keçib (`.local/build-ui31.log`, `.local/type-ui31.log`). ESLint 0 error, əvvəlki 2 login hard-navigation warning saxlanır (`.local/lint-ui31.log`). Yeni biznes/DB dəyişikliyi yoxdur; geniş DB və funksional suite bu kosmetik dəyişiklik üçün təkrar işlədilməyib.

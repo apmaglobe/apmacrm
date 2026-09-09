@@ -16,6 +16,7 @@ test("admin creates a missing customer and assigns several deal works to To Do",
   const customerDialog=page.getByRole("dialog").filter({has:page.getByRole("heading",{name:"Yeni müəssisə",exact:true})});
   await customerDialog.getByRole("button",{name:"Müəssisəni əlavə et",exact:true}).click();
   await expect(customerDialog).toHaveCount(0);
+  await page.getByLabel("Vasitəçi (satış əlaqələndiricisi)",{exact:true}).selectOption(fixtures[0].users[1].member);
   await page.getByLabel("İş / xidmət",{exact:true}).fill("Çəkiliş");
   await page.getByLabel("Departament",{exact:true}).selectOption({index:1});
   await page.getByLabel("İşin cavabdehi",{exact:true}).selectOption(fixtures[0].users[1].member);
@@ -32,5 +33,7 @@ test("admin creates a missing customer and assigns several deal works to To Do",
     await login(employeePage,1);
     await employeePage.goto("/workspace/todo");
     await expect(employeePage.getByRole("cell",{name:"Çəkiliş",exact:true}).first()).toBeVisible({timeout:15000});
+    await employeePage.getByRole("button",{name:"Ortaq sifarişlər",exact:true}).click();
+    await expect(employeePage.getByRole("cell",{name:"Meta Manager",exact:true}).first()).toBeVisible({timeout:15000});
   }finally{await employee.close();}
 });
