@@ -2465,6 +2465,16 @@ export type Database = {
         }
         Returns: Json
       }
+      customer_create: {
+        Args: {
+          customer_category: string
+          customer_name: string
+          customer_note: string
+          org: string
+          request_id: string
+        }
+        Returns: Json
+      }
       download_export: { Args: { job: string; org: string }; Returns: Json }
       export_command: {
         Args: {

@@ -10,13 +10,13 @@ AGENTS.md, README.md, docs/01–08 və prompts/02 oxunub. D01–D56, S01–S33 v
 
 | Mühit | Resurs | Vəziyyət |
 |---|---|---|
-| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 33 migration |
-| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 33 migration |
+| Supabase production | apma-crm, `clysniomfmmxwiozfizt`, Frankfurt | Free; 35 migration |
+| Supabase preview | apma-crm-preview, `obtlqejryfvcqfsjxeda`, Frankfurt | Free; eyni 35 migration |
 | Supabase təşkilat | apmaglobe, `mxpdnlyaiddizgeuwbwx` | Yeni ödənişli plan alınmayıb |
 | Vercel | apmaglobe / `team_Jce1EdJI8YIHwHAFgUxunCqq`; layihə `prj_vphfySBR5nYCPMfL2xf08Y20dbPW` | Hobby, bir OWNER; CLI bağlıdır |
-| Son preview | https://apma-frcvhbfrp-apmaglobe.vercel.app | Preview-17 READY; Vercel protection tətbiq olunur |
+| Son preview | https://apma-lzy1uxu6i-apmaglobe.vercel.app | Preview-18 READY; Vercel protection tətbiq olunur |
 | Əsas ünvan | https://apma-crm.vercel.app | Hobby production READY; ayrıca production env ilə build edilib |
-| Production deploy | https://apma-1q1vc98iq-apmaglobe.vercel.app | `dpl_14Mh2sbMLkAxw1h2utJYAacoUNTy`; production-4 READY |
+| Production deploy | https://apma-ic4zdroce-apmaglobe.vercel.app | `dpl_14GDt596duinMETA2Kc1G65x1nw2`; production-5 READY |
 
 Public/server env-lər preview və production üçün ayrı bazalara bağlıdır. Server açarları sensitive/private saxlanır. Auth confirmation, TOTP və bootstrap allowlist var; apmaglobe@gmail.com Auth hesabı production və preview-də istifadəçinin seçdiyi parolla yaradılıb; giriş hər ikisində təsdiqlənib. 08.09-da istifadəçinin Authenticator faktorunun verified olduğu yoxlanıb; ilkin admin claim hələ tamamlanmamışdı. Yeni axın TOTP ilə uğurlu girişdən sonra uyğun ilk admini avtomatik aktivləşdirir. Artıq AAL2 sessiyası olan istifadəçiyə tək aktivləşdirmə düyməsi göstərilir. SMTP çatdırılması yoxlanmayıb. İlkin preview yoxlamalarından sonra `--prod` ilə ayrıca production build yerləşdirilib; preview artifact production-a promote edilməyib. Vercel connector yeni layihədə 403/404 verir; düzgün bağlı CLI fallback işləyir.
 
@@ -74,6 +74,8 @@ Tema `#000000`, bütün portal/formalara tətbiq edilir və refresh-dən sonra s
 ## Davam nöqtəsi
 
 09.09 ümumi admin panel production-a yerləşdirildi: `/workspace/admin` girişində müraciət queue-su, ümumi/email link siyahısı, 1/7/30 gün, kopyalama, yeniləmə/ləğv və audit var. Köhnə Userlər → Dəvət keçidi pəncərəsinə də birbaşa **Kopyala** düyməsi əlavə edildi. 33-cü migration köhnəlmiş versiyanı retry edilən DB serializasiya xətası kimi deyil, HTTP409 kimi qaytarır; aylıq müqavilə pəncərəsi ən son müqavilə versiyasını istifadə edir. Lokal DB 41/41 və admin DB 10/10, preview-17-də köhnə dəvət/kopyalama və aylıq axın 2/2, yeni admin panel/Reatime/mobil axın 2/2 keçib. Production-4 əsas alias-a bağlıdır. S14 üzrə global qeydiyyat kataloqu açılmır; müraciət agentlik linki ilə bağlanır.
+
+09.09 qutu yaratma axını genişləndirildi: admin qutunu yaradarkən siyahıda olmayan müəssisəni bazaya əlavə edə, qutunun ümumi cavabdehini seçə və bir neçə işi (məsələn Çəkiliş, Edit, Meta Manager) fərqli əməkdaşlara təyin edə bilir. Hər təyinat həmin əməkdaşın To Do görünüşünə düşür. Müəssisənin manual yaradılması yalnız adminə açıqdır; bulk məlumat üçün Excel importu qalır. Lokal DB 42/42, admin DB 10/10 və yeni browser ssenarisi 1/1; preview-18-də eyni ssenari 1/1 keçib. Production-5 əsas alias-a bağlıdır. “Vasitəçi”nin komissiya/faktiki maliyyə mənası istifadəçi cavabı gözləyir.
 
 Son tələb tamamlandı: topbar “Canlı”, axtarış və filtr üslubu `5fc451f` ilə preview-13-də yoxlanıb, production-3 READY və əsas alias-a yerləşdirilib. Lokal/preview hərəsində7 UI yoxlaması; public production loginHTTP200 və yeni CSS-in əsas ünvandan gəldiyi təsdiqlənib (`.local/ui31-production-smoke.json`). Bu dəyişiklikdə production-da MFA keçərək iş sahəsi brauzer yoxlaması aparılmayıb; funksional vizual yoxlama preview-dədir. İstifadəçinin 12:24 screenshot-u artıq APMA iş sahəsini göstərir.
 

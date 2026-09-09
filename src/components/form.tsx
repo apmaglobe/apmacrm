@@ -16,6 +16,7 @@ export function Form({
       className="stack"
       onSubmit={async (e) => {
         e.preventDefault();
+        e.stopPropagation();
         const data = new FormData(e.currentTarget);
         setBusy(true);
         setError("");

@@ -146,6 +146,22 @@ try {
       "permission denied",
     );
   });
+  await check("manual customer is admin-only; initial owner and work assignees remain scoped", async () => {
+    await assert.rejects(
+      as(member,"select public.customer_create($1,$2,$3,$4,$5)",[orgA,"Bravo Market","Retail","Yeni qutu",randomUUID()]),
+      /ADMIN_REQUIRED/,
+    );
+    const created=await as<{result:{id:string;created:boolean} }>(admin,"select public.customer_create($1,$2,$3,$4,$5) result",[orgA,"Bravo Market","Retail","Yeni qutu",randomUUID()]);
+    assert.equal(created[0].result.created,true);
+    const multi=await command(admin,"deal.create",{customer_id:created[0].result.id,accountable_id:mO,works:[
+      {name:"Çəkiliş",department_id:depts[0].id,assignee_id:mM,amount:null},
+      {name:"Meta Manager",department_id:depts[1].id,assignee_id:mO,amount:null},
+    ]});
+    const row=(await pool.query("select accountable_id from public.deals where id=$1",[multi.id])).rows[0];
+    assert.equal(row.accountable_id,mO);
+    const mine=await as(member,"select name from public.todo_items($1,'mine','',0)",[orgA]);
+    assert(mine.some((item)=>item.name==="Çəkiliş"));
+  });
   const rid = randomUUID();
   const payload = {
     customer_id: customer,

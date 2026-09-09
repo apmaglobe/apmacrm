@@ -1,22 +1,28 @@
 "use client";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { browserClient } from "@/lib/auth/browser";
+import { Modal } from "@/components/dialog";
+import { Field, Form } from "@/components/form";
 export function CustomerSelect({
   org,
   entity = "customers",
   value,
   required = false,
   label = "Müəssisə",
+  allowCreate = false,
 }: {
   org: string;
   entity?: "customers"|"deals";
   value?: string;
   required?: boolean;
   label?: string;
+  allowCreate?: boolean;
 }) {
   const [q, setQ] = useState("");
   const [choice,setChoice]=useState<string>();
   const [chosen,setChosen]=useState<{id:string;name:string}|null>(null);
+  const [adding,setAdding]=useState(false);
   const query = useQuery({
     queryKey: ["workspace", org, entity, "customer-lookup", q],
     queryFn: async () => {
@@ -55,7 +61,14 @@ export function CustomerSelect({
         />
       </label>
       <label>{label}<select name={entity==="deals"?"deal_id":"customer_id"} aria-label={label} value={choice??value??""} required={required} onChange={e=>{const id=e.target.value;setChoice(id);setChosen(options.find(o=>o.id===id)??null);}}><option value="">Seçin</option>{options.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
+      {allowCreate&&entity==="customers"&&q.trim()&&!options.some(o=>o.name.localeCompare(q,undefined,{sensitivity:"accent"})===0)&&<button type="button" onClick={()=>setAdding(true)}>“{q.trim()}” adlı yeni müəssisə əlavə et</button>}
       {query.isError && <p role="alert">Müəssisə axtarışı alınmadı.</p>}
+      {adding&&<Modal title="Yeni müəssisə" onClose={()=>setAdding(false)}><Form label="Müəssisəni əlavə et" onSave={async f=>{
+        const name=String(f.get("name")??"");
+        const {data,error}=await browserClient().rpc("customer_create",{org,customer_name:name,customer_category:String(f.get("category")??""),customer_note:String(f.get("note")??""),request_id:crypto.randomUUID()});
+        if(error) throw new Error(error.message.includes("CUSTOMER_NAME_REQUIRED")?"Müəssisənin adını yazın.":"Müəssisə əlavə edilə bilmədi.");
+        const customer={id:data.id as string,name};setChosen(customer);setChoice(customer.id);setQ(name);setAdding(false);
+      }}><p className="helper">Bu müəssisə agentliyin ümumi bazasına əlavə olunacaq. Sonradan Map bölməsində məlumatlarını tamamlaya bilərsiniz.</p><Field name="name" label="Müəssisə adı" value={q.trim()} required/><Field name="category" label="Kateqoriya"/><label>Qeyd<textarea name="note" /></label></Form></Modal>}
     </>
   );
 }

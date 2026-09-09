@@ -27,6 +27,7 @@ export function CRM(props: PanelProps) {
   const [pipeline, setPipeline] = useState("sales"),
     [view, setView] = useState("board"),
     [create, setCreate] = useState(false),
+    [initialWorkCount, setInitialWorkCount] = useState(1),
     [selected, setSelected] = useState<string | null>(()=>params.get("deal")),
     [move, setMove] = useState<{ deal: Item; stage: string } | null>(null),
     [pending, setPending] = useState<Record<string, string>>({}),
@@ -188,7 +189,7 @@ export function CRM(props: PanelProps) {
             </button>
           </div>
           {pipeline === "sales" && (
-            <button className="primary" onClick={() => setCreate(true)}>
+            <button className="primary" onClick={() => {setInitialWorkCount(1);setCreate(true);}}>
               <Plus size={17} />
               Yeni qutu
             </button>
@@ -280,57 +281,49 @@ export function CRM(props: PanelProps) {
                 title: f.get("title"),
                 customer_id: f.get("customer_id"),
                 due_at: utc(f.get("due_at")),
-                works: [
-                  {
-                    quantity: Number(f.get("quantity")||1),
-                    name: f.get("work_name"),
-                    catalog_id: f.get("catalog_id") || null,
-                    department_id: f.get("department_id"),
-                    assignee_id: f.get("assignee_id") || member.id,
-                    amount: cents(f.get("amount")),
-                    due_at: utc(f.get("work_due_at")),
-                  },
-                ],
+                accountable_id: f.get("accountable_id"),
+                works: Array.from({length:initialWorkCount},(_,index)=>({
+                  quantity: Number(f.get(`quantity_${index}`)||1),
+                  name: f.get(`work_name_${index}`),
+                  catalog_id: f.get(`catalog_id_${index}`) || null,
+                  department_id: f.get(`department_id_${index}`),
+                  assignee_id: f.get(`assignee_id_${index}`) || member.id,
+                  amount: cents(f.get(`amount_${index}`)),
+                  due_at: utc(f.get(`work_due_at_${index}`)),
+                })),
               });
               setCreate(false);
               await refresh();
               setSelected(result.id);
             }}
           >
-            <Field name="title" label="Qutu adı" />
-            <CustomerSelect org={org} label="Müəssisə" required />
+            <Field name="title" label="Qutu adı" required />
+            <CustomerSelect org={org} label="Müəssisə" required allowCreate={member.is_admin}/>
             <p className="helper">
-              Müəssisə yoxdursa, admin Map bölməsindən Excel import etməlidir.
+              Siyahıda yoxdursa admin bu formadan yeni müəssisəni bazaya əlavə edə bilər.
               Siyahını axtarışla daralda bilərsiniz.
             </p>
-            <Field name="work_name" label="İş / xidmət" required />
-            <Field name="quantity" label="Miqdar" type="number" value={1} required/>
-            <p className="helper">Qiymət bütün iş sətrinin məbləğidir; miqdara avtomatik vurulmur.</p>
             <Select
-              name="catalog_id"
-              label="Xidmət kataloqu (istəyə görə)"
-              options={data.service_catalog?.filter((c) => !c.archived) ?? []}
-            />
-            <Select
-              name="department_id"
-              label="Departament"
-              options={data.departments ?? []}
+              name="accountable_id"
+              label="Qutunun cavabdehi"
+              options={data.memberships?.filter((m) => m.status === "active") ?? []}
+              value={member.id}
               required
             />
-            <Select
-              name="assignee_id"
-              label="İşin cavabdehi"
-              options={
-                data.memberships?.filter((m) => m.status === "active") ?? []
-              }
-              value={member.id}
-            />
-            <Field name="amount" label="İşin qiyməti (AZN)" />
-            <Field
-              name="work_due_at"
-              label="İşin deadline-ı"
-              type="datetime-local"
-            />
+            <h3>İşlər</h3>
+            <p className="helper">Hər işi ayrıca əməkdaşa təyin edin. Təyin edilən iş həmin əməkdaşın To Do siyahısında görünəcək.</p>
+            {Array.from({length:initialWorkCount},(_,index)=><fieldset key={index}><legend>İş {index+1}</legend>
+              <Field name={`work_name_${index}`} label={index===0?"İş / xidmət":`İş / xidmət ${index+1}`} required />
+              <Field name={`quantity_${index}`} label={index===0?"Miqdar":`Miqdar ${index+1}`} type="number" value={1} required/>
+              <p className="helper">Qiymət bütün iş sətrinin məbləğidir; miqdara avtomatik vurulmur.</p>
+              <Select name={`catalog_id_${index}`} label={index===0?"Xidmət kataloqu (istəyə görə)":`Xidmət kataloqu ${index+1} (istəyə görə)`} options={data.service_catalog?.filter((c) => !c.archived) ?? []}/>
+              <Select name={`department_id_${index}`} label={index===0?"Departament":`Departament ${index+1}`} options={data.departments ?? []} required/>
+              <Select name={`assignee_id_${index}`} label={index===0?"İşin cavabdehi":`İşin cavabdehi ${index+1}`} options={data.memberships?.filter((m) => m.status === "active") ?? []} value={member.id}/>
+              <Field name={`amount_${index}`} label={index===0?"İşin qiyməti (AZN)":`İşin qiyməti ${index+1} (AZN)`}/>
+              <Field name={`work_due_at_${index}`} label={index===0?"İşin deadline-ı":`İşin deadline-ı ${index+1}`} type="datetime-local"/>
+            </fieldset>)}
+            <button type="button" onClick={()=>setInitialWorkCount(count=>count+1)}><Plus size={16}/>İş əlavə et</button>
+            {initialWorkCount>1&&<button type="button" onClick={()=>setInitialWorkCount(count=>count-1)}>Son işi sil</button>}
             <Field name="due_at" label="Ümumi deadline" type="datetime-local" />
           </Form>
         </Modal>

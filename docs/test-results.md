@@ -8,6 +8,10 @@ Lokal `pnpm test:admin-db` **10/10**, mövcud `pnpm test:db` **41/41** keçib. `
 
 Production-4 `dpl_14Mh2sbMLkAxw1h2utJYAacoUNTy` READY-dir və [əsas URL](https://apma-crm.vercel.app)-ə bağlıdır. Login HTTP200 və yayımlanmış deployment yoxlanıb; son 15 dəqiqənin runtime logunda yalnız həmin login sorğusu var, xəta yoxdur (`.local/production4-runtime.log`). Production-da istifadəçinin MFA kodu ilə iş sahəsi sınağı aparılmayıb; funksional browser sübutları preview-yə aiddir. Supabase security advisor production və preview-də yalnız Free plandakı leaked-password protection WARN-ını qaytarır; performance advisor-da WARN/ERROR yoxdur, yalnız az istifadə olunan indeks INFO-ları var.
 
+## Qutu, yeni müəssisə və To Do — 09.09
+
+Lokal DB **42/42** və admin DB **10/10** keçib. Yeni Playwright ssenarisi adminin siyahıda olmayan müəssisəni yaratmasını, qutunun cavabdehini seçməsini, iki işi fərqli əməkdaşlara təyin etməsini və təyin olunan əməkdaşın To Do görünüşünü **1/1** keçib. Eyni ssenari preview-18-də də **1/1** keçib (`tests/e2e/deal-creation.spec.ts`, `.local/vercel-preview-18.log`). Production-5 `dpl_14GDt596duinMETA2Kc1G65x1nw2` READY-dir və əsas URL-ə bağlıdır. Production iş sahəsi MFA səbəbilə avtomatlaşdırılmış funksional testdən keçirilməyib.
+
 ## Son UI düzəlişi — 08.09, `5fc451f`
 
 Build və TypeScript keçib (`.local/build-ui31.log`, `.local/type-ui31.log`). ESLint 0 error, əvvəlki 2 login hard-navigation warning saxlanır (`.local/lint-ui31.log`). Yeni biznes/DB dəyişikliyi yoxdur; geniş DB və funksional suite bu kosmetik dəyişiklik üçün təkrar işlədilməyib.
