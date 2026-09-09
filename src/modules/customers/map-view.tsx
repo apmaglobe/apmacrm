@@ -25,27 +25,43 @@ export function MapView({
       L.tileLayer(
         key
           ? `https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${key}`
-          : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { attribution: key ? "Powered by Geoapify | © OpenStreetMap contributors" : "© OpenStreetMap contributors", maxZoom: 20 },
+          : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        { attribution: key ? "Powered by Geoapify | © OpenStreetMap contributors" : "© OpenStreetMap contributors © CARTO", maxZoom: 20 },
       ).addTo(map);
-      const cluster = L.markerClusterGroup();
+      L.control.scale({ imperial: false, position: "bottomleft" }).addTo(map);
+      const cluster = L.markerClusterGroup({
+        maxClusterRadius: 58,
+        disableClusteringAtZoom: 17,
+        showCoverageOnHover: false,
+        iconCreateFunction: (group) => {
+          const count = group.getChildCount();
+          const size = count > 100 ? "large" : count > 20 ? "medium" : "small";
+          return L.divIcon({
+            className: `map-cluster map-cluster-${size}`,
+            html: `<span>${count}</span>`,
+            iconSize: [44, 44],
+          });
+        },
+      });
       locations
         .filter((l) => l.latitude != null && l.longitude != null)
         .forEach((l) => {
-          const text = document.createElement("span");
-          text.textContent =
-            (customers.find((c) => c.id === l.customer_id)?.name ??
-              "Müəssisə") +
-            " · " +
-            (l.address ?? "");
+          const popup = document.createElement("div");
+          popup.className = "map-popup";
+          const name = document.createElement("strong");
+          name.textContent = customers.find((c) => c.id === l.customer_id)?.name ?? "Müəssisə";
+          const address = document.createElement("span");
+          address.textContent = l.address ?? "Ünvan daxil edilməyib";
+          popup.append(name, address);
           cluster.addLayer(
             L.marker([l.latitude!, l.longitude!], {
               icon: L.divIcon({
                 className: "map-pin",
-                html: "●",
-                iconSize: [22, 22],
+                html: "<span></span>",
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
               }),
-            }).bindPopup(text),
+            }).bindPopup(popup, { closeButton: false, offset: [0, -12] }),
           );
         });
       map.addLayer(cluster);
