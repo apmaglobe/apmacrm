@@ -60,7 +60,22 @@ export function CustomerSelect({
           placeholder={entity==="deals"?"Qutu adını yazın":"Müəssisə adını yazın"}
         />
       </label>
-      <label>{label}<select name={entity==="deals"?"deal_id":"customer_id"} aria-label={label} value={choice??value??""} required={required} onChange={e=>{const id=e.target.value;setChoice(id);setChosen(options.find(o=>o.id===id)??null);}}><option value="">Seçin</option>{options.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
+      <input type="hidden" name={entity==="deals"?"deal_id":"customer_id"} value={choice??value??""} />
+      <div className="customer-picker">
+        <div className="customer-picker-label">{label}</div>
+        <div className="customer-options" role="listbox" aria-label={label}>
+          {!options.length&&!query.isLoading&&<p className="customer-empty">{q.trim()?"Nəticə tapılmadı.":"Ad yazaraq axtarın."}</p>}
+          {options.map((option)=><button
+            type="button"
+            role="option"
+            aria-selected={(choice??value)===option.id}
+            className={(choice??value)===option.id?"selected":""}
+            key={option.id}
+            onClick={()=>{setChoice(option.id);setChosen(option);setQ(option.name);}}
+          >{option.name}</button>)}
+        </div>
+        {required&&!(choice??value)&&<p className="helper">Qutu yaratmaq üçün müəssisə seçin.</p>}
+      </div>
       {allowCreate&&entity==="customers"&&q.trim()&&!options.some(o=>o.name.localeCompare(q,undefined,{sensitivity:"accent"})===0)&&<button type="button" onClick={()=>setAdding(true)}>“{q.trim()}” adlı yeni müəssisə əlavə et</button>}
       {query.isError && <p role="alert">Müəssisə axtarışı alınmadı.</p>}
       {adding&&<Modal title="Yeni müəssisə" onClose={()=>setAdding(false)}><Form label="Müəssisəni əlavə et" onSave={async f=>{

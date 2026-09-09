@@ -966,6 +966,13 @@ table select {
 .map-popup strong { font-size: 13px; }
 .map-popup span { color: #5d6b77; font-size: 12px; line-height: 1.45; }
 .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 12px 30px rgb(15 23 42 / 18%); }
+.customer-picker { display: grid; gap: 7px; }
+.customer-picker-label { color: var(--text); font-size: 13px; font-weight: 700; }
+.customer-options { max-height: 210px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 5px; }
+.customer-options button { display: flex; width: 100%; min-height: 36px; align-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--text); padding: 8px 10px; text-align: left; font: inherit; font-size: 13px; }
+.customer-options button:hover, .customer-options button:focus-visible { background: var(--soft); outline: none; }
+.customer-options button.selected { background: color-mix(in srgb, var(--accent) 15%, var(--surface)); color: var(--accent); font-weight: 700; }
+.customer-empty { margin: 7px 10px; color: var(--muted); font-size: 13px; }
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
