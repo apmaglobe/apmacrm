@@ -88,11 +88,12 @@ export function Login() {
   async function signInWithGoogle(){
     setBusy(true);setMessage("");
     try{
-      const {error}=await db.auth.signInWithOAuth({
+      const {data,error}=await db.auth.signInWithOAuth({
         provider:"google",
-        options:{redirectTo:`${window.location.origin}/auth/callback`},
+        options:{redirectTo:`${window.location.origin}/auth/callback`,skipBrowserRedirect:true},
       });
-      if(error)throw error;
+      if(error||!data.url)throw error??Error("GOOGLE_OAUTH_URL_MISSING");
+      window.location.assign(data.url);
     }catch{
       setMessage("Google ilə giriş başlatılmadı. Bir az sonra yenidən sınayın.");
       setBusy(false);
