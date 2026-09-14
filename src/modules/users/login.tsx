@@ -102,6 +102,20 @@ export function Login() {
       setBusy(false);
     }
   }
+  async function linkGoogleIdentity(){
+    setBusy(true);setMessage("");
+    try{
+      const {data,error}=await db.auth.linkIdentity({
+        provider:"google",
+        options:{redirectTo:`${window.location.origin}/auth/callback`,skipBrowserRedirect:true},
+      });
+      if(error||!data?.url)throw error??Error("GOOGLE_IDENTITY_URL_MISSING");
+      window.location.assign(data.url);
+    }catch{
+      setMessage("Google hesabı bağlanmadı. Yenidən sınayın.");
+      setBusy(false);
+    }
+  }
   async function enroll(){
     setBusy(true);setMessage("");
     try{
@@ -142,6 +156,7 @@ export function Login() {
     {message&&<p role="status" className="notice">{message}</p>}
     {!signed&&mode!=="loading"&&<div className="auth-links"><button disabled={busy} onClick={()=>{setMessage("");setMode(mode==="register"?"login":"register");}}>{mode==="register"?"Girişə qayıt":"Qeydiyyat"}</button><button disabled={busy} onClick={()=>{setMessage("");setMode("reset");}}>Şifrəni unutdum</button></div>}
     {signed&&<div className="stack">
+      {mode==="account"&&<button disabled={busy} onClick={linkGoogleIdentity}>{busy?"Gözləyin…":"Google hesabını bağla"}</button>}
       {(mode==="account"||mode==="pending")&&<button disabled={busy} onClick={()=>{setMessage("");setMode("password");}}>Şifrəni yenilə</button>}
       {mode==="password"&&<button disabled={busy} onClick={()=>{setMessage("");void resolve();}}>Hesaba qayıt</button>}
       <button disabled={busy} onClick={async()=>{await db.auth.signOut({scope:"local"});setSigned(false);setMode("login");setQr("");setMessage("");}}>Çıxış</button>
