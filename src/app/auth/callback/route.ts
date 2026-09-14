@@ -20,7 +20,12 @@ export async function GET(req: NextRequest) {
       },
     );
     const { error } = await db.auth.exchangeCodeForSession(code);
-    if (!error) return response;
+    if (!error) {
+      console.info("AUTH_CALLBACK_SESSION_EXCHANGED", { provider: "oauth" });
+      return response;
+    }
+    console.warn("AUTH_CALLBACK_SESSION_EXCHANGE_FAILED", { code: error.code ?? "unknown" });
   }
+  console.warn("AUTH_CALLBACK_MISSING_OR_INVALID_CODE", { hasCode: Boolean(code) });
   return NextResponse.redirect(new URL("/login?error=oauth", req.url));
 }
