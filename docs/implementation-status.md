@@ -89,6 +89,8 @@ Son tələb tamamlandı: topbar “Canlı”, axtarış və filtr üslubu `5fc45
 
 ## Lokal davam
 
+14.09 qutu və xəritə axını yeniləndi: satış qutusu müəssisə seçilmədən draft kimi yaradıla bilir; sifariş təsdiqinə keçiddə mövcud `CONFIRMATION_FIELDS_REQUIRED` qaydası müəssisə, qiymət və deadline-ları yenə məcburi saxlayır. Mövcud müəssisə ilə qutu yaradan qeyri-admin əməkdaş üçün DB sınağı keçib. Adminlər Map-də yeni məkan əlavə edə, pin popup-u və siyahıdan məkanı düzəldə, silmədə isə qeydi arxivləyə bilir. Lokal 44 DB ssenarisi, lint və build keçib; migration production Supabase-ə tətbiq olunub. Production deployment `dpl_7NbwjYRX1nc6ri4uwyY4paUa4NBr` READY, əsas login URL HTTP 200-dir.
+
 10.09 dəvət müraciəti bildirişi düzəldildi: ümumi qoşulma və emailə bağlı fərdi dəvət qəbul ediləndə hər aktiv admin üçün tenant-izolyasiyalı in-app bildiriş yaranır. Açıq admin panel mövcud Realtime invalidation ilə müraciət siyahısını yeniləyir və yeni pending müraciət artdıqda ekranda təsdiq mesajı göstərir. Lokal migration tətbiq edilib; admin access DB yoxlaması 10/10, typecheck və build keçib. Migration production Supabase-ə tətbiq olunub, Vercel deployment `dpl_AXp3ZkC8sNtzxPeT6Ese9XyHjP1a` READY-dir; əsas URL `/login` HTTP 200 cavab verir.
 
 PATH: `/opt/homebrew/bin:/Users/rafaelaghazade/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin`. Colima `apma-crm`, Docker `~/.colima/apma-crm/docker.sock`; lokal API54321/DB54322/Next3000. Restore API55321/DB55322. Build ilə server eyni `.next`-ə paralel yazmamalıdır. `.env.local` yalnız lokal bazadır. `.local/fixture.json`, `.local/preview-fixture.json`, cloud-connection və backup key ignored/private-dir; çıxışa verməyin.
