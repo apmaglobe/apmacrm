@@ -89,8 +89,9 @@ export function Login() {
     }catch(error){
       const reason=error instanceof Error?error.message:"";
       if(/session missing|invalid.*token|expired/i.test(reason))setMessage("Bərpa keçidi etibarsızdır və ya müddəti bitib. Yeni keçid istəyin.");
+      else if(/same|different from.*old/i.test(reason))setMessage("Yeni şifrə əvvəlki şifrədən fərqli olmalıdır.");
       else if(/password.*(least|short|length)|weak password/i.test(reason))setMessage("Yeni şifrə ən azı 6 simvol olmalıdır.");
-      else setMessage("Şifrə yenilənmədi. Yeni bərpa keçidi istəyib bir dəfə açın.");
+      else setMessage(reason?`Şifrə yenilənmədi: ${reason}`:"Şifrə yenilənmədi. Yeni bərpa keçidi istəyib bir dəfə açın.");
     }
     finally{setBusy(false);}
   }
