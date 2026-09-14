@@ -112,3 +112,5 @@ PATH: `/opt/homebrew/bin:/Users/rafaelaghazade/.cache/codex-runtimes/codex-prima
 14.09 Password recovery diagnostics: recovery update rəddinin ümumi mesajı konkret, məxfi məlumat göstərməyən Supabase səbəbi ilə əvəz olundu (məsələn, eyni şifrə, müddəti bitmiş sessiya və ya parol qaydası). Typecheck/build keçdi; production `dpl_6PAe9o8fgGZ6Rcn2J4yLhbHxkCS6` READY-dir. Faktiki Auth provider cavabı istifadəçi yeni recovery sessiyasında növbəti cəhddə görünəcək.
 
 14.09 Admin giriş bərpası: istifadəçinin açıq göstərişi ilə `apmaglobe@gmail.com` üçün Supabase Auth parolu birbaşa yeniləndi. Production Auth password-grant sorğusu HTTP 200 qaytardı və hesabın emaili ilə doğrulandı. Parol və tokenlər repoya, status sənədinə və istifadəçi cavabına yazılmadı.
+
+14.09 Tasklar: To Do-dan sonra ayrıca Tasklar səhifəsi əlavə edildi. Səhifə mövcud `work_items` və `deal_cards` məlumatları ilə işləyir; Mənim tasklarım, Sifarişlər və admin üçün Komanda görünüşü, status filtri, deadline/cavabdeh məlumatı və iş statusunun CRM-dəki eyni qeyd üzərində yenilənməsi var. Yeni ayrıca task cədvəli yaradılmadı. `pnpm typecheck` və `pnpm build` keçdi.

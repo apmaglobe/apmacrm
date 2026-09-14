@@ -4,7 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import {Download} from "lucide-react";
 import {Modal} from "./dialog";
 import {command} from "@/lib/db/api";
-const supported=["crm","map","todo","finance","subscriptions","tools","meetings","portfolio","drive","users"];
+const supported=["crm","map","todo","tasks","finance","subscriptions","tools","meetings","portfolio","drive","users"];
 type Job={id:string;module:string;format:string;status:string;last_error:string|null};
 export function Export({org,module,q,filters={}}:{org:string;module:string;q:string;filters?:Record<string,string>}){
  const [open,setOpen]=useState(false),[format,setFormat]=useState("xlsx"),[error,setError]=useState(""),[busy,setBusy]=useState(false);
@@ -21,7 +21,7 @@ export function Export({org,module,q,filters={}}:{org:string;module:string;q:str
  return <><button className="icon-button" aria-label="İxrac et" onClick={()=>setOpen(true)}><Download size={17}/></button>{open&&<Modal title="Məlumat ixracı" onClose={()=>setOpen(false)}>
  <p>Modul: {module}. Axtarış: {q||"Hamısı"}. Yalnız cari girişinizə uyğun qeydlər və sahələr çıxarılır. Tarixlər UTC, məbləğlər AZN-dir. XLSX əlaqəli qeydləri ayrı vərəqlərdə saxlayır; CSV əsas cədvəli saxlayır.</p>
  {Object.entries(filters).filter(([,v])=>v).length>0&&<p>Əlavə filtrlər: {Object.entries(filters).filter(([,v])=>v).map(([k,v])=>k+": "+v).join(" · ")}</p>}
- {module==="todo"&&<p>İxracın əhatəsi: {filters.scope==="team"?"komanda":filters.scope==="shared"?"ortaq sifarişlər":"öz işləriniz"}.</p>}
+ {(module==="todo"||module==="tasks")&&<p>İxracın əhatəsi: {filters.scope==="team"?"komanda":filters.scope==="shared"?"ortaq sifarişlər":"öz işləriniz"}.</p>}
  <label className="field">Format<select value={format} onChange={e=>setFormat(e.target.value)}><option value="xlsx">Excel (.xlsx)</option><option value="csv">CSV</option></select></label>
  <button className="primary" disabled={busy} onClick={create}>{busy?"Hazırlanır…":"İxracı hazırla"}</button>
  {error&&<p role="alert" className="notice error">{error}</p>}

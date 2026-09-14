@@ -11,6 +11,7 @@ export const modules = [
   ["meetings", "Meetlər"],
   ["users", "Userlər"],
   ["todo", "To Do"],
+  ["tasks", "Tasklar"],
 ] as const;
 export const salesStages = [
   ["to_call", "Zəng ediləcək"],

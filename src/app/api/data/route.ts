@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 const tables: Record<string, string[]> = {
   crm: ["pipeline_stages"],
   todo: ["work_items", "deal_cards"],
+  tasks: ["work_items", "deal_cards"],
   map: ["customers", "customer_locations", "contacts", "import_jobs"],
   tools: ["tools", "tool_units", "tool_reservations"],
   finance: [
@@ -183,7 +184,7 @@ export async function GET(req: NextRequest) {
     names.map(async (table) => {
       if (section === "map" && table === "customers")
         return [table, data.customers] as const;
-      if(section==="todo"&&table==="work_items"){
+      if(["todo","tasks"].includes(section)&&table==="work_items"){
         const offset=Number(req.nextUrl.searchParams.get("offset")??0);const r=await db.rpc("todo_items",{org,scope:req.nextUrl.searchParams.get("scope")??"mine",search:q??"",skip_rows:Number.isSafeInteger(offset)&&offset>=0?offset:0});if(r.error)throw Error("TODO_FAILED");return [table,r.data] as const;
       }
       let query = db.from(table).select(table === "import_jobs" ? "id,organization_id,file_hash,mapping,status,cursor,errors,version,created_by,created_at,storage_path" : "*").eq("organization_id", org);

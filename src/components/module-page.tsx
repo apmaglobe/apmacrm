@@ -12,6 +12,7 @@ import { Finance } from "@/modules/finance/panel";
 import { AdminPanel } from "@/modules/users/admin-access";
 import { Users } from "@/modules/users/panel";
 import { Subscriptions } from "@/modules/subscriptions/panel";
+import { Tasks } from "@/modules/tasks/panel";
 export type PanelProps = {
   org: string;
   data: WorkspaceData;
@@ -25,7 +26,7 @@ export function ModulePage({ module, org, adminMode = false }: { module: string;
   const [q, setQ] = useState("");
   const [filters,setFilters]=useState<Record<string,string>>({});
   const cache = useQueryClient();
-  const paged = !["crm","map","todo","overview"].includes(module);
+  const paged = !["crm","map","todo","tasks","overview"].includes(module);
   const query = useInfiniteQuery({
     initialPageParam: 0,
     queryKey: ["workspace", org, module, q, module === "overview" ? filters : null],
@@ -94,6 +95,8 @@ export function ModulePage({ module, org, adminMode = false }: { module: string;
         <Users {...props} />
       ) : module === "subscriptions" ? (
         <Subscriptions {...props} />
+      ) : module === "tasks" ? (
+        <Tasks {...props} />
       ) : (
         <Operations {...props} module={module} />
       )}
