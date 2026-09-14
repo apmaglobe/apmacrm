@@ -90,6 +90,8 @@ export const errorLabels: Record<string, string> = {
     "Açıq işlər qaldığı üçün Bitdi səbəbi tələb olunur.",
   ZERO_REASON_REQUIRED: "Sıfır qiymətin səbəbini yazın.",
   INACTIVE_ASSIGNEE: "Cavabdeh aktiv əməkdaş olmalıdır.",
+  CUSTOMER_NOT_FOUND: "Müəssisə bazada tapılmadı.",
+  INVALID_COORDINATES: "Koordinatlar düzgün deyil.",
   LAST_ADMIN: "Son aktiv admin dayandırıla bilməz.",
   ADMIN_RECONCILIATION_REQUIRED:
     "Azalma ödəniş bölgüsünə toxunur. Admin uyğunlaşdırması lazımdır.",

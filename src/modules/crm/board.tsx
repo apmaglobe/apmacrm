@@ -299,10 +299,10 @@ export function CRM(props: PanelProps) {
             }}
           >
             <Field name="title" label="Qutu adı" required />
-            <CustomerSelect org={org} label="Müəssisə" required allowCreate={member.is_admin}/>
+            <CustomerSelect org={org} label="Müəssisə" allowCreate={member.is_admin}/>
             <p className="helper">
+              Müəssisə sonradan da seçilə bilər. Sifarişi təsdiqləməzdən əvvəl müəssisə seçilməlidir.
               Siyahıda yoxdursa admin bu formadan yeni müəssisəni bazaya əlavə edə bilər.
-              Siyahını axtarışla daralda bilərsiniz.
             </p>
             <Select
               name="accountable_id"
@@ -754,7 +754,7 @@ export function DealDetail({
                 }}
               >
                 <Field name="title" label="Ad" value={d.title} />
-                {!d.first_confirmed_at&&<CustomerSelect org={org} label="Müəssisə" value={d.customer_id} required/>}
+                {!d.first_confirmed_at&&<CustomerSelect org={org} label="Müəssisə" value={d.customer_id}/>} 
                 <label className="check"><input name="archived" type="checkbox" defaultChecked={d.archived}/>Arxivləşdir</label>
                 <Select
                   name="accountable_id"

@@ -7,9 +7,13 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 export function MapView({
   locations,
   customers,
+  editable = false,
+  onEdit,
 }: {
   locations: Item[];
   customers: Item[];
+  editable?: boolean;
+  onEdit?: (location: Item) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -50,6 +54,11 @@ export function MapView({
           const address = document.createElement("span");
           address.textContent = l.address ?? "Ünvan daxil edilməyib";
           popup.append(name, address);
+          if(editable&&onEdit){
+            const edit=document.createElement("button");
+            edit.type="button";edit.textContent="Məkanı düzəlt";
+            edit.addEventListener("click",()=>onEdit(l));popup.append(edit);
+          }
           cluster.addLayer(
             L.marker([l.latitude!, l.longitude!], {
               icon: L.divIcon({
@@ -67,6 +76,6 @@ export function MapView({
       stop = true;
       map?.remove();
     };
-  }, [locations, customers]);
+  }, [locations, customers, editable, onEdit]);
   return <div className="map" ref={ref} />;
 }

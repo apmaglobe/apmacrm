@@ -179,6 +179,16 @@ try {
     ],
   };
   let deal = await command(member, "deal.create", payload, 1, rid);
+  await check("sales box may start without a customer; map location edits stay admin-only", async () => {
+    const draft=await command(member,"deal.create",{works:[{name:"Müəssisəsiz ilkin iş",department_id:depts[0].id,assignee_id:mM,amount:null}]});
+    assert.equal((await pool.query("select customer_id from public.deals where id=$1",[draft.id])).rows[0].customer_id,null);
+    await assert.rejects(command(member,"deal.stage",{deal_id:draft.id,stage:"confirmed"},draft.version),/CONFIRMATION_FIELDS_REQUIRED/);
+    await reject(member,"select public.map_command($1,$2,$3,0,$4)",[orgA,"location.save",{customer_id:customer,name:"Qadağan",latitude:"40.4",longitude:"49.8"},randomUUID()],"ADMIN_REQUIRED");
+    const saved=(await as<{r:{id:string}}>(admin,"select public.map_command($1,$2,$3,0,$4) r",[orgA,"location.save",{customer_id:customer,name:"Yeni pin",address:"Bakı",latitude:"40.4",longitude:"49.8"},randomUUID()]))[0].r;
+    let location=(await pool.query("select version,archived from public.customer_locations where id=$1",[saved.id])).rows[0];assert.equal(location.archived,false);
+    await as(admin,"select public.map_command($1,$2,$3,$4,$5)",[orgA,"location.delete",{id:saved.id},location.version,randomUUID()]);
+    location=(await pool.query("select archived from public.customer_locations where id=$1",[saved.id])).rows[0];assert.equal(location.archived,true);
+  });
   await check("AC-07 business retry creates one deal", async () => {
     assert.equal(
       (await command(member, "deal.create", payload, 1, rid)).id,

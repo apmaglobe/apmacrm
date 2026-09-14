@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     if (customers.error) return NextResponse.json({ error: "CUSTOMERS_FAILED" }, { status: 400 });
     const ids = customers.data.map((customer) => customer.id);
     const locations = ids.length
-      ? await db.from("customer_locations").select("id,customer_id,address,latitude,longitude").eq("organization_id", org).in("customer_id", ids).not("latitude", "is", null).not("longitude", "is", null).limit(5000)
+      ? await db.from("customer_locations").select("id,customer_id,name,address,latitude,longitude,version").eq("organization_id", org).eq("archived",false).in("customer_id", ids).not("latitude", "is", null).not("longitude", "is", null).limit(5000)
       : { data: [], error: null };
     if (locations.error) return NextResponse.json({ error: "LOCATIONS_FAILED" }, { status: 400 });
     return NextResponse.json({ customers: customers.data, locations: locations.data }, { headers: { "Cache-Control": "private, no-store" } });
@@ -194,7 +194,7 @@ export async function GET(req: NextRequest) {
         query = query.in(
           "customer_id",
           selectedCustomers.map((c) => c.id),
-        );
+        ).eq("archived",false);
       }
       if (id && section === "crm") {
         if (table === "deals") query = query.eq("id", id);

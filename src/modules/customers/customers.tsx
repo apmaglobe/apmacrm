@@ -3,7 +3,8 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { browserClient } from "@/lib/auth/browser";
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { Upload, MapPin, Building2, FileSpreadsheet } from "lucide-react";
+import { Upload, MapPin, Building2, FileSpreadsheet, Plus, Pencil, Trash2 } from "lucide-react";
+import { CustomerSelect } from "@/components/customer-select";
 import type { PanelProps } from "@/components/module-page";
 import { command } from "@/lib/db/api";
 import { Modal } from "@/components/dialog";
@@ -87,6 +88,7 @@ export function Customers({
   const [importOpen, setImportOpen] = useState(false),
     [pin, setPin] = useState<Item | null>(null),
     [edit, setEdit] = useState<Item | null>(null),
+    [locationEdit,setLocationEdit]=useState<Item|null|undefined>(undefined),
     [rollback, setRollback] = useState<Item | null>(null);
   return (
     <>
@@ -105,12 +107,15 @@ export function Customers({
               Excel importu
             </button>
           )}
+          {member.is_admin&&<button onClick={()=>setLocationEdit(null)}><Plus size={17}/>Məkan əlavə et</button>}
         </div>
       </div>
       {showMap && (
         <MapView
           locations={mapData.data?.locations ?? []}
           customers={mapData.data?.customers ?? []}
+          editable={member.is_admin}
+          onEdit={setLocationEdit}
         />
       )}
       <div className="customer-grid">
@@ -147,7 +152,7 @@ export function Customers({
                     </small>
                   </div>
                   {member.is_admin && (
-                    <button onClick={() => setPin(l)}>Pin</button>
+                    <div className="toolbar"><button onClick={() => setLocationEdit(l)}><Pencil size={15}/>Düzəliş</button><button aria-label={`${l.name||"Məkan"} sil`} onClick={async()=>{await command(org,"map","location.delete",{id:l.id},l.version);await refresh();await mapData.refetch();}}><Trash2 size={15}/>Sil</button></div>
                   )}
                 </div>
               ))}
@@ -303,6 +308,21 @@ export function Customers({
               Qeyd
               <textarea name="note" defaultValue={edit.note} />
             </label>
+          </Form>
+        </Modal>
+      )}
+      {locationEdit!==undefined&&(
+        <Modal title={locationEdit?"Məkanı düzəlt":"Yeni məkan"} onClose={()=>setLocationEdit(undefined)}>
+          <Form label="Saxla" onSave={async f=>{
+            await command(org,"map","location.save",{id:locationEdit?.id??null,customer_id:f.get("customer_id"),name:f.get("name"),address:f.get("address"),latitude:String(f.get("latitude")??"").replace(",","."),longitude:String(f.get("longitude")??"").replace(",",".")},locationEdit?.version??0);
+            await refresh();await mapData.refetch();setLocationEdit(undefined);
+          }}>
+            <CustomerSelect org={org} label="Müəssisə" value={locationEdit?.customer_id} required/>
+            <Field name="name" label="Məkan / filial adı" value={locationEdit?.name}/>
+            <Field name="address" label="Ünvan" value={locationEdit?.address}/>
+            <Field name="latitude" label="Enlik" value={locationEdit?.latitude??undefined}/>
+            <Field name="longitude" label="Uzunluq" value={locationEdit?.longitude??undefined}/>
+            <p className="helper">Xəritədə göstərilməsi üçün hər iki koordinatı daxil edin.</p>
           </Form>
         </Modal>
       )}

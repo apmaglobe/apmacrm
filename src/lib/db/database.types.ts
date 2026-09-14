@@ -364,6 +364,7 @@ export type Database = {
       customer_locations: {
         Row: {
           address: string | null
+          archived: boolean
           customer_id: string
           external_id: string
           id: string
@@ -376,6 +377,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          archived?: boolean
           customer_id: string
           external_id: string
           id?: string
@@ -388,6 +390,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          archived?: boolean
           customer_id?: string
           external_id?: string
           id?: string
@@ -2548,6 +2551,16 @@ export type Database = {
         Returns: string
       }
       login_context: { Args: never; Returns: Json }
+      map_command: {
+        Args: {
+          expected_version: number
+          operation: string
+          org: string
+          payload: Json
+          request_id: string
+        }
+        Returns: Json
+      }
       monthly_portfolio: { Args: { org: string }; Returns: Json }
       operations_command: {
         Args: {
@@ -2627,6 +2640,7 @@ export type Database = {
     }
   }
 }
+
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
@@ -2752,3 +2766,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
