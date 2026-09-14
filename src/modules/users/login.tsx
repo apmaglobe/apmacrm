@@ -42,8 +42,12 @@ export function Login() {
     }else setMode("pending");
   },[db]);
   useEffect(() => {
-    if(new URLSearchParams(window.location.search).get("error")==="oauth"){
+    const params=new URLSearchParams(window.location.search);
+    if(params.get("error")==="oauth"){
       setMessage("Google girişi tamamlanmadı. Google hesabının test istifadəçisi kimi əlavə edildiyini yoxlayın və yenidən sınayın.");
+    }
+    if(params.get("password")==="updated"){
+      setMessage("Şifrə yeniləndi. Email və yeni şifrənizlə yenidən daxil olun.");
     }
     let timer:ReturnType<typeof setTimeout>;
     const {data}=db.auth.onAuthStateChange((event)=>{
@@ -71,7 +75,9 @@ export function Login() {
         const {error}=await db.auth.resetPasswordForEmail(inputEmail,{redirectTo:location.origin+"/auth/callback?flow=recovery"});
         if(error)throw error;setMessage("Ünvan uyğun olarsa, şifrə yeniləmə keçidi göndəriləcək.");
       }else if(mode==="password"){
-        const {error}=await db.auth.updateUser({password});if(error)throw error;window.history.replaceState({},"","/login");setMessage("Şifrə yeniləndi.");
+        const {error}=await db.auth.updateUser({password});if(error)throw error;
+        await db.auth.signOut({scope:"local"});
+        window.location.assign("/login?password=updated");return;
       }else if(mode==="mfa"){
         const {error}=await db.auth.mfa.challengeAndVerify({factorId:factor,code:String(form.get("code"))});
         if(error){setMessage("Təsdiq kodu qəbul edilmədi. Authenticator tətbiqindəki cari 6 rəqəmli kodu yazın.");return;}
@@ -83,7 +89,7 @@ export function Login() {
     }catch(error){
       const reason=error instanceof Error?error.message:"";
       if(/session missing|invalid.*token|expired/i.test(reason))setMessage("Bərpa keçidi etibarsızdır və ya müddəti bitib. Yeni keçid istəyin.");
-      else if(/password.*(least|short|length)|weak password/i.test(reason))setMessage("Yeni şifrə ən azı 10 simvol olmalıdır.");
+      else if(/password.*(least|short|length)|weak password/i.test(reason))setMessage("Yeni şifrə ən azı 6 simvol olmalıdır.");
       else setMessage("Şifrə yenilənmədi. Yeni bərpa keçidi istəyib bir dəfə açın.");
     }
     finally{setBusy(false);}
@@ -148,7 +154,7 @@ export function Login() {
         <label>Təsdiq kodu<input name="code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code" required/></label>
       </>:<>
         {mode!=="password"&&<label>Email<input name="email" type="email" autoComplete="email" required/></label>}
-        {mode!=="reset"&&<label>Şifrə<input name="password" type="password" minLength={mode==="register"||mode==="password"?10:undefined} autoComplete={mode==="register"||mode==="password"?"new-password":"current-password"} required/></label>}
+        {mode!=="reset"&&<label>Şifrə<input name="password" type="password" minLength={mode==="register"?10:mode==="password"?6:undefined} autoComplete={mode==="register"||mode==="password"?"new-password":"current-password"} required/></label>}
       </>}
       <button className="primary" disabled={busy}>{busy?"Gözləyin…":mode==="login"?"Daxil ol":"Davam et"}</button>
     </form>}
