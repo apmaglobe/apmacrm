@@ -85,6 +85,19 @@ export function Login() {
     }
     finally{setBusy(false);}
   }
+  async function signInWithGoogle(){
+    setBusy(true);setMessage("");
+    try{
+      const {error}=await db.auth.signInWithOAuth({
+        provider:"google",
+        options:{redirectTo:`${window.location.origin}/auth/callback`},
+      });
+      if(error)throw error;
+    }catch{
+      setMessage("Google ilə giriş başlatılmadı. Bir az sonra yenidən sınayın.");
+      setBusy(false);
+    }
+  }
   async function enroll(){
     setBusy(true);setMessage("");
     try{
@@ -121,6 +134,7 @@ export function Login() {
       </>}
       <button className="primary" disabled={busy}>{busy?"Gözləyin…":mode==="login"?"Daxil ol":"Davam et"}</button>
     </form>}
+    {!signed&&(mode==="login"||mode==="register")&&<button type="button" className="oauth-button" disabled={busy} onClick={signInWithGoogle}><span className="google-mark" aria-hidden="true">G</span><span>Google ilə davam et</span></button>}
     {message&&<p role="status" className="notice">{message}</p>}
     {!signed&&mode!=="loading"&&<div className="auth-links"><button disabled={busy} onClick={()=>{setMessage("");setMode(mode==="register"?"login":"register");}}>{mode==="register"?"Girişə qayıt":"Qeydiyyat"}</button><button disabled={busy} onClick={()=>{setMessage("");setMode("reset");}}>Şifrəni unutdum</button></div>}
     {signed&&<div className="stack">

@@ -632,6 +632,36 @@ label.search {
 .auth-card .primary {
   width: 100%;
 }
+.oauth-button {
+  width: 100%;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 650;
+}
+.oauth-button:hover:not(:disabled) {
+  border-color: #8aa79e;
+  background: #f7fbf9;
+}
+.google-mark {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(from -42deg, #4285f4 0 25%, #34a853 25% 48%, #fbbc05 48% 73%, #ea4335 73% 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
 label {
   display: flex;
   flex-direction: column;
