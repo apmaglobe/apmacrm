@@ -194,7 +194,8 @@ export async function GET(req: NextRequest) {
         query = query.in(
           "customer_id",
           selectedCustomers.map((c) => c.id),
-        ).eq("archived",false);
+        );
+        if (table === "customer_locations") query = query.eq("archived", false);
       }
       if (id && section === "crm") {
         if (table === "deals") query = query.eq("id", id);
