@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 const tables: Record<string, string[]> = {
   crm: ["pipeline_stages"],
   todo: ["work_items", "deal_cards"],
-  tasks: ["work_items", "deal_cards"],
+  tasks: ["internal_tasks", "internal_task_assignments", "internal_task_updates"],
   map: ["customers", "customer_locations", "contacts", "import_jobs"],
   tools: ["tools", "tool_units", "tool_reservations"],
   finance: [
@@ -60,6 +60,31 @@ export async function GET(req: NextRequest) {
   const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
   if (!member || (member.is_admin && aal.data?.currentLevel !== "aal2"))
     return NextResponse.json({ error: "ACCESS_DENIED" }, { status: 403 });
+  if (section === "tasks") {
+    const offset = Number(req.nextUrl.searchParams.get("offset") ?? 0);
+    const from = Number.isSafeInteger(offset) && offset >= 0 ? offset : 0;
+    let query = (db as any)
+      .from("internal_tasks")
+      .select("*")
+      .eq("organization_id", org)
+      .eq("archived", false)
+      .order("updated_at", { ascending: false })
+      .range(from, from + 199);
+    if (q) query = query.ilike("title", "%" + q.replace(/[%_]/g, "") + "%");
+    const taskResult = await query;
+    if (taskResult.error) return NextResponse.json({ error: "TASKS_FAILED" }, { status: 400 });
+    const ids = taskResult.data.map((task: { id: string }) => task.id);
+    const [assignments, updates] = await Promise.all([
+      ids.length ? (db as any).from("internal_task_assignments").select("*").eq("organization_id", org).in("task_id", ids) : { data: [], error: null },
+      ids.length ? (db as any).from("internal_task_updates").select("*").eq("organization_id", org).in("task_id", ids).order("created_at", { ascending: false }) : { data: [], error: null },
+    ]);
+    if (assignments.error || updates.error) return NextResponse.json({ error: "TASK_DETAILS_FAILED" }, { status: 400 });
+    return NextResponse.json({
+      data: { internal_tasks: taskResult.data, internal_task_assignments: assignments.data, internal_task_updates: updates.data, memberships: (await db.from("memberships").select("*").eq("organization_id", org)).data ?? [], roles: (await db.from("roles").select("*").eq("organization_id", org)).data ?? [] },
+      member,
+      hasMore: taskResult.data.length === 200,
+    }, { headers: { "Cache-Control": "private, no-store" } });
+  }
   if (section === "map" && req.nextUrl.searchParams.get("all_locations") === "1") {
     const customers = await db
       .from("customers")

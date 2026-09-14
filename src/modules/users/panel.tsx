@@ -17,6 +17,7 @@ const permissions = [
   "commercials.read",
   "commercials.write",
   "finance.read",
+  "tasks.write",
   ...modules.map((m) => m[0] + ".export"),
 ];
 export function Users({ org, data, member, refresh, inAdmin = false }: PanelProps & {inAdmin?: boolean}) {

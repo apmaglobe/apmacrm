@@ -14,6 +14,7 @@ const input = z.object({
     "subscription",
     "export",
     "map",
+    "tasks",
   ]),
   operation: z.string().max(60),
   payload: z.record(z.string(), z.unknown()),

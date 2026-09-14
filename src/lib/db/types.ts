@@ -46,6 +46,7 @@ export type Item = {
   commercial?: { total: number | null } | null;
   customer_id: string;
   deal_id: string;
+  task_id: string;
   work_id: string;
   department_id: string;
   assignee_id: string;
