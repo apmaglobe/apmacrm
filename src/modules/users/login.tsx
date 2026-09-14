@@ -42,6 +42,9 @@ export function Login() {
     }else setMode("pending");
   },[db]);
   useEffect(() => {
+    if(new URLSearchParams(window.location.search).get("error")==="oauth"){
+      setMessage("Google girişi tamamlanmadı. Google hesabının test istifadəçisi kimi əlavə edildiyini yoxlayın və yenidən sınayın.");
+    }
     let timer:ReturnType<typeof setTimeout>;
     const {data}=db.auth.onAuthStateChange((event)=>{
       // Supabase emits this callback while holding its auth lock; resolve outside that lock.

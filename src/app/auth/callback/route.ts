@@ -22,5 +22,5 @@ export async function GET(req: NextRequest) {
     const { error } = await db.auth.exchangeCodeForSession(code);
     if (!error) return response;
   }
-  return NextResponse.redirect(new URL("/login?error=link", req.url));
+  return NextResponse.redirect(new URL("/login?error=oauth", req.url));
 }
