@@ -77,7 +77,12 @@ export function Login() {
         const {error}=await db.auth.signInWithPassword({email:inputEmail,password});if(error)throw error;
         await resolve(true);
       }
-    }catch{setMessage("Əməliyyat alınmadı. Məlumatları və bağlantını yoxlayıb yenidən sınayın.");}
+    }catch(error){
+      const reason=error instanceof Error?error.message:"";
+      if(/session missing|invalid.*token|expired/i.test(reason))setMessage("Bərpa keçidi etibarsızdır və ya müddəti bitib. Yeni keçid istəyin.");
+      else if(/password.*(least|short|length)|weak password/i.test(reason))setMessage("Yeni şifrə ən azı 10 simvol olmalıdır.");
+      else setMessage("Şifrə yenilənmədi. Yeni bərpa keçidi istəyib bir dəfə açın.");
+    }
     finally{setBusy(false);}
   }
   async function enroll(){
