@@ -88,8 +88,12 @@ export function Customers({
   const [importOpen, setImportOpen] = useState(false),
     [pin, setPin] = useState<Item | null>(null),
     [edit, setEdit] = useState<Item | null>(null),
+    [deleteCustomer, setDeleteCustomer] = useState<Item | null>(null),
     [locationEdit,setLocationEdit]=useState<Item|null|undefined>(undefined),
     [rollback, setRollback] = useState<Item | null>(null);
+  const role = data.roles?.find((role) => role.id === member.role_id);
+  const canMapWrite = member.is_admin || member.overrides?.["map.write"] === "allow" || (member.overrides?.["map.write"] !== "deny" && role?.permissions?.includes("map.write"));
+  const canManageCustomer = (customer: Item) => member.is_admin || customer.created_by === member.id;
   return (
     <>
       <div className="section-toolbar">
@@ -107,14 +111,14 @@ export function Customers({
               Excel importu
             </button>
           )}
-          {member.is_admin&&<button onClick={()=>setLocationEdit(null)}><Plus size={17}/>Məkan əlavə et</button>}
+          {canMapWrite&&<><button className="primary" onClick={()=>setEdit({} as Item)}><Plus size={17}/>Müəssisə əlavə et</button><button onClick={()=>setLocationEdit(null)}><Plus size={17}/>Məkan əlavə et</button></>}
         </div>
       </div>
       {showMap && (
         <MapView
           locations={mapData.data?.locations ?? []}
           customers={mapData.data?.customers ?? []}
-          editable={member.is_admin}
+          editable={canMapWrite}
           onEdit={setLocationEdit}
         />
       )}
@@ -151,13 +155,13 @@ export function Customers({
                         : "Koordinat əlavə edilməyib"}
                     </small>
                   </div>
-                  {member.is_admin && (
+                  {canManageCustomer(c) && (
                     <div className="toolbar"><button onClick={() => setLocationEdit(l)}><Pencil size={15}/>Düzəliş</button><button aria-label={`${l.name||"Məkan"} sil`} onClick={async()=>{await command(org,"map","location.delete",{id:l.id},l.version);await refresh();await mapData.refetch();}}><Trash2 size={15}/>Sil</button></div>
                   )}
                 </div>
               ))}
-              {member.is_admin && (
-                <button onClick={() => setEdit(c)}>Məlumatı düzəlt</button>
+              {canManageCustomer(c) && (
+                <div className="toolbar"><button onClick={() => setEdit(c)}><Pencil size={15}/>Düzəliş</button><button aria-label={`${c.name} sil`} onClick={() => setDeleteCustomer(c)}><Trash2 size={15}/>Sil</button></div>
               )}
             </article>
           );
@@ -283,20 +287,20 @@ export function Customers({
         </Modal>
       )}
       {edit && (
-        <Modal title="Müəssisə məlumatı" onClose={() => setEdit(null)}>
+        <Modal title={edit.id ? "Müəssisə məlumatı" : "Yeni müəssisə"} onClose={() => setEdit(null)}>
           <Form
             onSave={async (f) => {
               await command(
                 org,
-                "import",
-                "customer.update",
+                "map",
+                "customer.save",
                 {
-                  id: edit.id,
+                  ...(edit.id ? { id: edit.id } : {}),
                   name: f.get("name"),
                   category: f.get("category"),
                   note: f.get("note"),
                 },
-                edit.version,
+                edit.version ?? 0,
               );
               await refresh();
               setEdit(null);
@@ -311,6 +315,7 @@ export function Customers({
           </Form>
         </Modal>
       )}
+      {deleteCustomer && (<Modal title="Müəssisəni sil" onClose={() => setDeleteCustomer(null)}><Form label="Müəssisəni sil" onSave={async () => { await command(org, "map", "customer.delete", { id: deleteCustomer.id }, deleteCustomer.version); await refresh(); await mapData.refetch(); setDeleteCustomer(null); }}><p><strong>{deleteCustomer.name}</strong> müəssisə siyahıdan və xəritədən silinəcək. Bağlı CRM qutularının tarixçəsi qorunacaq.</p></Form></Modal>)}
       {locationEdit!==undefined&&(
         <Modal title={locationEdit?"Məkanı düzəlt":"Yeni məkan"} onClose={()=>setLocationEdit(undefined)}>
           <Form label="Saxla" onSave={async f=>{
