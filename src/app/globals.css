@@ -1578,3 +1578,10 @@ table select {
 .task-updates { display: grid; gap: 10px; }
 .task-updates article { border-left: 3px solid var(--soft); padding: 12px 14px; background: var(--bg); border-radius: 0 8px 8px 0; }
 .task-updates strong { font-size: 13px; }.task-updates small { margin-left: 8px; color: var(--muted); }.task-updates p { margin: 7px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.permission-groups { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.permission-group { margin: 0; padding: 14px; border: 1px solid var(--border); border-radius: 10px; min-width: 0; }
+.permission-group legend { padding: 0 6px; color: var(--accent); font-size: 12px; font-weight: 700; }
+.permission-group > label { display: grid; gap: 5px; margin: 0 0 10px; font-size: 12px; color: var(--text); }
+.permission-group > label:last-child { margin-bottom: 0; }
+.permission-group select { font-size: 12px; min-height: 35px; }
+@media(max-width:760px) { .permission-groups { grid-template-columns: 1fr; } }

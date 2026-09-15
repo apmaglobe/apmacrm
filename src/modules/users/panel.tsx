@@ -13,13 +13,18 @@ import { Modal } from "@/components/dialog";
 import { Form, Field, Select } from "@/components/form";
 import { command } from "@/lib/db/api";
 import { dateTime, modules, cents } from "@/lib/domain";
-const permissions = [
-  "commercials.read",
-  "commercials.write",
-  "finance.read",
-  "tasks.write",
-  ...modules.map((m) => m[0] + ".export"),
-];
+const permissionGroups: { title: string; items: readonly (readonly [string, string])[] }[] = [
+  { title: "CRM və kommersiya", items: [["crm.read", "CRM qutularını gör"], ["crm.write", "CRM qutularını yarat və düzəlt"], ["commercials.read", "Qiymətləri gör"], ["commercials.write", "Qiymətləri dəyiş"]] },
+  { title: "Müştəri və xəritə", items: [["map.read", "Müəssisə bazası və xəritə"], ["map.write", "Müəssisə və pinləri düzəlt"], ["map.import", "Excel import et"]] },
+  { title: "İşin idarəsi", items: [["todo.read", "Sifariş To Do siyahısı"], ["tasks.read", "Daxili taskları gör"], ["tasks.write", "Daxili task yarat, təyin et və sil"], ["tools.read", "Alətləri gör"], ["tools.write", "Alət və rezervasiyanı idarə et"], ["meetings.read", "Görüşləri gör"], ["meetings.write", "Görüş yarat və düzəlt"]] },
+  { title: "Maliyyə və abunəlik", items: [["finance.read", "Balansı və ödənişləri gör"], ["finance.write", "Ödəniş və maliyyə sənədi yarat"], ["subscriptions.read", "Aylıq abunəlikləri gör"], ["subscriptions.write", "Aylıq abunəlikləri idarə et"], ["portfolio.read", "Portfeli gör"]] },
+  { title: "Kommunikasiya və materiallar", items: [["inbox.read", "Inbox mesajlarını gör"], ["inbox.write", "Mesaj göndər"], ["drive.read", "Drive materiallarını gör"], ["drive.write", "Material linki əlavə et"]] },
+  { title: "İdarəetmə", items: [["users.read", "Əməkdaşları gör"], ["users.write", "Əməkdaşları və rolları idarə et"], ["settings.write", "Agentlik parametrlərini dəyiş"], ["webhooks.write", "Webhook-ları idarə et"]] },
+  { title: "İxrac", items: modules.map(([id, label]) => [id + ".export", label + " ixracı"]) },
+] as const;
+const permissions = permissionGroups.flatMap((group) => group.items.map(([code]) => code));
+const permissionLabel = (code: string) => permissionGroups.flatMap((group) => group.items).find(([item]) => item === code)?.[1] ?? code;
+
 export function Users({ org, data, member, refresh, inAdmin = false }: PanelProps & {inAdmin?: boolean}) {
   const [profile,setProfile]=useState<Item|null>(null);
   const [inviteLink, setInviteLink] = useState("");
@@ -129,6 +134,7 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
             </span>
             <small>Qoşulub: {dateTime(m.joined_at)}</small>
             <p>{m.skills?.join(" · ")}</p>
+            {member.is_admin && Object.entries(m.overrides ?? {}).filter(([, value]) => value !== "inherit").length > 0 && <small>Fərdi hüquqlar: {Object.entries(m.overrides ?? {}).filter(([, value]) => value !== "inherit").map(([code, value]) => `${permissionLabel(code)} · ${value === "allow" ? "aktiv" : "bağlı"}`).join(", ")}</small>}
             {member.is_admin && (
               <button onClick={() => setSelected(m)}>
                 <Shield size={15} />
@@ -250,21 +256,10 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
               label="Bacarıqlar (vergüllə)"
               value={selected.skills?.join(", ")}
             />
-            <h3>Fərdi icazələr</h3>
-            <div className="mapping-grid">
-              {permissions.map((p) => (
-                <Select
-                  key={p}
-                  name={p}
-                  label={p}
-                  value={selected.overrides?.[p] ?? "inherit"}
-                  options={[
-                    { id: "inherit", name: "Roldan götür" },
-                    { id: "allow", name: "İcazə ver" },
-                    { id: "deny", name: "Bağla" },
-                  ]}
-                />
-              ))}
+            <h3>Hesab üzrə səlahiyyətlər</h3>
+            <p className="helper">Hər seçim rolun qaydasını bu konkret hesab üçün əvəz edir.</p>
+            <div className="permission-groups">
+              {permissionGroups.map((group) => <fieldset key={group.title} className="permission-group"><legend>{group.title}</legend>{group.items.map(([code, label]) => <Select key={code} name={code} label={label} value={selected.overrides?.[code] ?? "inherit"} options={[{ id: "inherit", name: "Roldan götür" }, { id: "allow", name: "Aktiv" }, { id: "deny", name: "Söndür" }]}/>)}</fieldset>)}
             </div>
           </Form>
         </Modal>
@@ -327,27 +322,9 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
               </>
             ) : (
               add !== "department" && (
-                <fieldset>
-                  <legend>Rol icazələri</legend>
-                  {permissions.map((p) => (
-                    <label className="check" key={p}>
-                      <input
-                        type="checkbox"
-                        name="permissions"
-                        value={p}
-                        defaultChecked={
-                          role
-                            ? role.permissions?.includes(p)
-                            : [
-                                "commercials.read",
-                                "commercials.write",
-                              ].includes(p)
-                        }
-                      />
-                      {p}
-                    </label>
-                  ))}
-                </fieldset>
+                <div className="permission-groups">
+                  {permissionGroups.map((group) => <fieldset key={group.title} className="permission-group"><legend>{group.title}</legend>{group.items.map(([code, label]) => <label className="check" key={code}><input type="checkbox" name="permissions" value={code} defaultChecked={role ? role.permissions?.includes(code) : ["commercials.read", "commercials.write"].includes(code)}/>{label}</label>)}</fieldset>)}
+                </div>
               )
             )}
           </Form>
