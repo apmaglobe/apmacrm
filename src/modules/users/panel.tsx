@@ -23,8 +23,18 @@ const permissionGroups: { title: string; items: readonly (readonly [string, stri
   { title: "İxrac", items: modules.map(([id, label]) => [id + ".export", label + " ixracı"]) },
 ] as const;
 const permissions = permissionGroups.flatMap((group) => group.items.map(([code]) => code));
+const adminOnlyPermissions = new Set(["users.write", "settings.write", "webhooks.write"]);
+const fullAccessPermissions = permissions.filter((permission) => !adminOnlyPermissions.has(permission));
 const permissionLabel = (code: string) => permissionGroups.flatMap((group) => group.items).find(([item]) => item === code)?.[1] ?? code;
 
+function AccessPreset({ selected }: { selected: Item }) {
+  const initial = fullAccessPermissions.every((permission) => selected.overrides?.[permission] === "allow") && [...adminOnlyPermissions].every((permission) => selected.overrides?.[permission] === "deny") ? "full" : "simple";
+  const [preset, setPreset] = useState(initial);
+  return <section className="access-preset" aria-label="Giriş paketi">
+    <div><h3>Giriş paketi</h3><p>{preset === "full" ? "Bütün gündəlik iş modulları açıqdır. Sistem admini və idarəetmə hüquqları verilmir." : "Rolun və aşağıdakı detallı seçimlərin qaydaları istifadə olunur."}</p></div>
+    <label>Giriş səviyyəsi<select name="access_preset" value={preset} onChange={(event) => setPreset(event.target.value)}><option value="full">Full Access</option><option value="simple">Sadə</option></select></label>
+  </section>;
+}
 export function Users({ org, data, member, refresh, inAdmin = false }: PanelProps & {inAdmin?: boolean}) {
   const [profile,setProfile]=useState<Item|null>(null);
   const [inviteLink, setInviteLink] = useState("");
@@ -182,8 +192,9 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
         >
           <Form
             onSave={async (f) => {
+              const fullAccess = f.get("access_preset") === "full";
               const overrides = Object.fromEntries(
-                permissions.map((p) => [p, f.get(p)]),
+                permissions.map((p) => [p, fullAccess ? (adminOnlyPermissions.has(p) ? "deny" : "allow") : f.get(p)]),
               );
               await command(
                 org,
@@ -256,8 +267,9 @@ export function Users({ org, data, member, refresh, inAdmin = false }: PanelProp
               label="Bacarıqlar (vergüllə)"
               value={selected.skills?.join(", ")}
             />
+            <AccessPreset selected={selected} />
             <h3>Hesab üzrə səlahiyyətlər</h3>
-            <p className="helper">Hər seçim rolun qaydasını bu konkret hesab üçün əvəz edir.</p>
+            <p className="helper">Sadə seçimində hər hüquq rolun qaydasını bu konkret hesab üçün əvəz edir.</p>
             <div className="permission-groups">
               {permissionGroups.map((group) => <fieldset key={group.title} className="permission-group"><legend>{group.title}</legend>{group.items.map(([code, label]) => <Select key={code} name={code} label={label} value={selected.overrides?.[code] ?? "inherit"} options={[{ id: "inherit", name: "Roldan götür" }, { id: "allow", name: "Aktiv" }, { id: "deny", name: "Söndür" }]}/>)}</fieldset>)}
             </div>

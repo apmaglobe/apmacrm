@@ -1585,3 +1585,6 @@ table select {
 .permission-group > label:last-child { margin-bottom: 0; }
 .permission-group select { font-size: 12px; min-height: 35px; }
 @media(max-width:760px) { .permission-groups { grid-template-columns: 1fr; } }
+.access-preset { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 16px; margin-bottom: 18px; background: var(--soft); border: 1px solid #cbe2d9; border-radius: 10px; }
+.access-preset h3 { margin: 0; }.access-preset p { margin: 5px 0 0; color: var(--muted); font-size: 12px; max-width: 470px; }.access-preset label { min-width: 160px; margin: 0; font-size: 12px; }.access-preset select { margin-top: 5px; }
+@media(max-width:760px) { .access-preset { align-items: stretch; flex-direction: column; }.access-preset label { min-width: 0; } }
