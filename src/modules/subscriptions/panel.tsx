@@ -1,7 +1,7 @@
 "use client";
 import { CustomerSelect } from "@/components/customer-select";
 import { useState } from "react";
-import { Plus, Repeat } from "lucide-react";
+import { Plus, Repeat, Trash2 } from "lucide-react";
 import type { PanelProps } from "@/components/module-page";
 import type { Item } from "@/lib/db/types";
 import { Modal } from "@/components/dialog";
@@ -76,6 +76,7 @@ export function Subscriptions({ org, data, member, refresh }: PanelProps) {
               >
                 İş planını düzəlt
               </button>
+              <button className="danger" title="Müqaviləni sil" onClick={async()=>{try{await command(org,"lifecycle","archive",{kind:"contract",id:c.id},c.version);await refresh();}catch(e){setError(String(e));}}}><Trash2 size={15}/> Sil</button>
               {c.status === "active" ? (
                 <>
                   <button

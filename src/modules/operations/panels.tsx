@@ -9,6 +9,7 @@ import {
   Camera,
   MessageCircle,
   CheckCircle2,
+  Trash2,
 } from "lucide-react";
 import type { PanelProps } from "@/components/module-page";
 import type { Item, WorkspaceData } from "@/lib/db/types";
@@ -206,7 +207,7 @@ export function Operations(props: PanelProps & { module: string }) {
             )}
           </div>
           <div className="card-grid">
-            {data.tools?.map((t) => (
+            {data.tools?.filter((t) => !t.archived).map((t) => (
               <article className="surface tool-card" key={t.id}>
                 <Camera size={26} />
                 <h2>{t.name}</h2>
@@ -231,13 +232,16 @@ export function Operations(props: PanelProps & { module: string }) {
                       )}
                     </div>
                   ))}
-                <button
-                  className="primary"
-                  disabled={t.state !== "active"}
-                  onClick={() => setSelected(t)}
-                >
-                  Rezervasiya et
-                </button>
+                <div className="toolbar">
+                  <button
+                    className="primary"
+                    disabled={t.state !== "active"}
+                    onClick={() => setSelected(t)}
+                  >
+                    Rezervasiya et
+                  </button>
+                  {(member.is_admin || t.created_by === member.id) && <button aria-label={`${t.name} sil`} title="Sil" onClick={() => command(org, "lifecycle", "archive", {kind:"tool",id:t.id}, t.version).then(refresh).catch((e)=>setError(String(e)))}><Trash2 size={16}/></button>}
+                </div>
               </article>
             ))}
           </div>
@@ -312,7 +316,7 @@ export function Operations(props: PanelProps & { module: string }) {
             </button>
           </div>
           <div className="card-grid">
-            {data.meetings?.map((m) => (
+            {data.meetings?.filter((m) => !m.archived).map((m) => (
               <article className="surface" key={m.id}>
                 <span className="badge">
                   {m.kind === "online" ? "Online" : "Əyani"}
@@ -336,9 +340,10 @@ export function Operations(props: PanelProps & { module: string }) {
                   >
                     Təqvimə endir
                   </a>
-                  {(member.is_admin || m.created_by === member.id) && (
+                  {(member.is_admin || m.created_by === member.id) && <>
                     <button onClick={() => setSelected(m)}>Düzəliş</button>
-                  )}
+                    <button aria-label={`${m.title} sil`} title="Sil" onClick={() => command(org, "lifecycle", "archive", {kind:"meeting",id:m.id}, m.version).then(refresh).catch((e)=>setError(String(e)))}><Trash2 size={16}/></button>
+                  </>}
                 </div>
               </article>
             ))}
@@ -765,7 +770,7 @@ function Inbox({ org, data, member, refresh }: PanelProps) {
               <Plus size={17} />
             </button>
           </div>
-          {data.conversations?.map((c) => (
+          {data.conversations?.filter((c) => !c.archived).map((c) => (
             <button
               key={c.id}
               className={"chat-row " + (c.id === chat ? "active" : "")}
@@ -802,12 +807,12 @@ function Inbox({ org, data, member, refresh }: PanelProps) {
           {chat ? (
             <>
               <h2>{data.conversations?.find((c) => c.id === chat)?.title}</h2>
-              {data.conversations?.find((c) => c.id === chat)?.created_by ===
-                member.id && (
-                <button onClick={() => setManage(true)}>
-                  İştirakçıları idarə et
-                </button>
+              <div className="toolbar">
+              {data.conversations?.find((c) => c.id === chat)?.created_by === member.id && (
+                <button onClick={() => setManage(true)}>İştirakçıları idarə et</button>
               )}
+              {(member.is_admin || data.conversations?.find((c) => c.id === chat)?.created_by === member.id) && <button title="Söhbəti sil" onClick={async () => {const c=data.conversations?.find((x)=>x.id===chat); if(!c)return; await command(org,"lifecycle","archive",{kind:"conversation",id:c.id},c.version); setChat(null); await refresh();}}><Trash2 size={16}/> Sil</button>}
+              </div>
               <label>
                 Mesajlarda axtarış
                 <input

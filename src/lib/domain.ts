@@ -97,6 +97,7 @@ export const errorLabels: Record<string, string> = {
   TASK_ASSIGNEE_REQUIRED: "Ən azı bir cavabdeh seçin.",
   TASK_TITLE_REQUIRED: "Taskın adını yazın.",
   TASK_UPDATE_REQUIRED: "Görülən iş qeydini yazın.",
+  OWNER_REQUIRED: "Yalnız yaradan və ya admin bu qeydi silə bilər.",
   CUSTOMER_NOT_FOUND: "Müəssisə bazada tapılmadı.",
   MAP_WRITE_REQUIRED: "Müəssisə yaratmaq səlahiyyətiniz yoxdur.",
   CUSTOMER_MANAGER_REQUIRED: "Bu müəssisəni idarə etmək səlahiyyətiniz yoxdur.",

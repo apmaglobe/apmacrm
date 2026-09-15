@@ -247,6 +247,8 @@ export async function GET(req: NextRequest) {
         query = query.eq("archived", false).order("name");
         if (q && section === "map") query = query.ilike("name", "%" + q.replace(/[%_]/g, "") + "%");
       }
+      if (["tools", "meetings", "conversations", "service_contracts"].includes(table)) query = query.eq("archived", false);
+      if (table === "resource_links" && !(section === "crm" && id)) query = query.eq("archived", false);
       if (table === "deal_cards") {
         const pipeline = req.nextUrl.searchParams.get("pipeline") ?? "sales";
         query = query.eq("archived", false);

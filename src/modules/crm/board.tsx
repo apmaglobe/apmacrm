@@ -583,7 +583,7 @@ export function DealDetail({
                   >
                     {l.title}
                     <ArrowUpRight size={16} />
-                  </a>{canEdit&&<button onClick={()=>setLinkEdit(l)}>Düzəliş</button>}</div>
+                  </a>{canEdit&&<button onClick={()=>setLinkEdit(l)}>Düzəliş</button>}{(member.is_admin||l.created_by===member.id)&&<button title="Materialı sil" onClick={async()=>{await command(org,"lifecycle","archive",{kind:"resource_link",id:l.id},l.version);await refresh();}}>Sil</button>}</div>
                 ))}
               </div>
               {canEdit && (
@@ -735,7 +735,7 @@ export function DealDetail({
               ))}
             </div>
           )}
-          {linkEdit&&<Modal title="Materialı düzəlt" onClose={()=>setLinkEdit(null)}><Form onSave={async f=>{await command(org,"operations","link.save",{id:linkEdit.id,deal_id:id,title:f.get("title"),url:f.get("url"),category:f.get("category"),archived:f.get("archived")==="on"},linkEdit.version);await refresh();setLinkEdit(null);}}><Field name="title" label="Material adı" value={linkEdit.title} required/><Field name="url" label="HTTPS keçid" type="url" value={linkEdit.url} required/><Field name="category" label="Kateqoriya" value={linkEdit.category}/><label className="check"><input type="checkbox" name="archived"/>Arxivləşdir</label></Form></Modal>}
+          {linkEdit&&<Modal title="Materialı düzəlt" onClose={()=>setLinkEdit(null)}><Form onSave={async f=>{await command(org,"operations","link.save",{id:linkEdit.id,deal_id:id,title:f.get("title"),url:f.get("url"),category:f.get("category"),archived:f.get("archived")==="on"},linkEdit.version);await refresh();setLinkEdit(null);}}><Field name="title" label="Material adı" value={linkEdit.title} required/><Field name="url" label="HTTPS keçid" type="url" value={linkEdit.url} required/><Field name="category" label="Kateqoriya" value={linkEdit.category}/><label className="check"><input type="checkbox" name="archived"/>Sil / arxivləşdir</label></Form></Modal>}
           {parentEdit && (
             <Modal title="Qutu məlumatı" onClose={() => setParentEdit(false)}>
               <Form
@@ -755,7 +755,7 @@ export function DealDetail({
               >
                 <Field name="title" label="Ad" value={d.title} />
                 {!d.first_confirmed_at&&<CustomerSelect org={org} label="Müəssisə" value={d.customer_id}/>} 
-                <label className="check"><input name="archived" type="checkbox" defaultChecked={d.archived}/>Arxivləşdir</label>
+                <label className="check"><input name="archived" type="checkbox" defaultChecked={d.archived}/>Qutunu sil / arxivləşdir</label>
                 <Select
                   name="accountable_id"
                   label="Ümumi cavabdeh"
