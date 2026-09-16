@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
   const { domain, ...args } = parsed.data;
   const { data, error } = await db.rpc(`${domain}_command`, args);
   if (error) {
+    console.error("COMMAND_FAILED", { domain, operation: args.operation, code: error.code, message: error.message });
     const code = Object.keys(errorLabels).find((c) =>
       error.message.includes(c),
     );
