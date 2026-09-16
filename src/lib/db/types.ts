@@ -17,6 +17,9 @@ export type Item = {
   external_event_id: string;
   count: number;
   customer_name: string;
+  contact_phone: string | null;
+  contact_name: string | null;
+  caller_id: string;
   deals: number;
   confirmed_sales: number;
   open_work: number;

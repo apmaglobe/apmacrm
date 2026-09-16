@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { allowed } from "@/lib/auth/permissions";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { Plus, Columns3, List, Clock, ArrowUpRight, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Plus, Columns3, List, Clock, ArrowUpRight, SlidersHorizontal, ChevronDown, Phone, CircleX } from "lucide-react";
 import {
   salesStages,
   recurringStages,
@@ -30,6 +30,7 @@ export function CRM(props: PanelProps) {
     [initialWorkCount, setInitialWorkCount] = useState(1),
     [selected, setSelected] = useState<string | null>(()=>params.get("deal")),
     [move, setMove] = useState<{ deal: Item; stage: string } | null>(null),
+    [call, setCall] = useState<{ deal: Item; kind: "call" | "meaningless" } | null>(null),
     [pending, setPending] = useState<Record<string, string>>({}),
     [error, setError] = useState("");
   const filters=props.filters??{};
@@ -97,6 +98,27 @@ export function CRM(props: PanelProps) {
       setMove({ deal, stage });
     else transition(deal, stage);
   }
+  async function saveCall(form: FormData) {
+    if (!call) return;
+    const { deal, kind } = call;
+    setError("");
+    setPending((p) => ({ ...p, [deal.id]: kind }));
+    try {
+      const result = await command(org, "crm", kind === "call" ? "call.record" : "call.meaningless", {
+        deal_id: deal.id,
+        phone: form.get("phone"),
+        note: form.get("note"),
+      }, deal.version) as { phone?: string };
+      setCall(null);
+      await refresh();
+      if (kind === "call" && result.phone) window.location.href = `tel:${String(result.phone).replace(/[^+0-9*#]/g, "")}`;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Zəng qeydə alınmadı");
+      await refresh();
+    } finally {
+      setPending((p) => { const n={...p}; delete n[deal.id]; return n; });
+    }
+  }
   const card = (d: Item) => (
     <article
       key={d.id}
@@ -151,6 +173,12 @@ export function CRM(props: PanelProps) {
             </option>
           ))}
       </select>
+      {d.pipeline === "sales" && d.stage === "to_call" && (
+        <div className="call-actions">
+          <button type="button" disabled={!!pending[d.id]} onClick={() => setCall({ deal:d, kind:"call" })}><Phone size={14}/>Zəng et</button>
+          <button type="button" className="danger" disabled={!!pending[d.id]} onClick={() => setCall({ deal:d, kind:"meaningless" })}><CircleX size={14}/>Mənasız</button>
+        </div>
+      )}
       {pending[d.id] && <span className="save-label">Saxlanır…</span>}
     </article>
   );
@@ -366,6 +394,17 @@ export function CRM(props: PanelProps) {
                 : "Dəyişiklik / açıq iş səbəbi"}
               <textarea name="reason" required={move.stage !== "lost"} />
             </label>
+          </Form>
+        </Modal>
+      )}
+      {call && (
+        <Modal title={call.kind === "call" ? "Zəng et" : "Mənasız müəssisə"} onClose={() => setCall(null)}>
+          <Form label={call.kind === "call" ? "Zəngi başlat" : "Lost-a göndər"} onSave={saveCall}>
+            {call.kind === "call" ? <>
+              <Field name="phone" label="Telefon nömrəsi" value={String(call.deal.contact_phone ?? "")} required />
+              <p className="helper">Saxlanandan sonra telefonunuzun yığma tətbiqi açılacaq. Qeydi zəngdən əvvəl və ya qısa nəticə kimi yaza bilərsiniz.</p>
+            </> : <p className="helper">Qutu dərhal Lost-a keçiriləcək və əməliyyatı edən şəxs zəng qeydinə yazılacaq.</p>}
+            <label>Qısa qeyd (istəyə görə)<textarea name="note" maxLength={2000} /></label>
           </Form>
         </Modal>
       )}

@@ -3,6 +3,7 @@ import { serverClient } from "@/lib/auth/server";
 export const dynamic = "force-dynamic";
 const tables: Record<string, string[]> = {
   crm: ["pipeline_stages"],
+  calls: ["sales_calls"],
   todo: ["work_items", "deal_cards"],
   tasks: ["internal_tasks", "internal_task_assignments", "internal_task_updates"],
   marketing: ["marketing_plans", "marketing_plan_items", "deals"],
@@ -168,9 +169,17 @@ export async function GET(req: NextRequest) {
     const rows = result.data.rows as {customer_id?:string;customer_name?:string}[];
     const customerIds = [...new Set(rows.map(r=>r.customer_id).filter((v):v is string=>!!v))];
     if(customerIds.length){
-      const customers=await db.from("customers").select("id,name").eq("organization_id",org).in("id",customerIds);
-      if(customers.error) return NextResponse.json({error:"LOOKUP_FAILED"},{status:400});
+      const [customers,contacts]=await Promise.all([
+        db.from("customers").select("id,name").eq("organization_id",org).in("id",customerIds),
+        db.from("contacts").select("customer_id,phone,name").eq("organization_id",org).in("customer_id",customerIds).not("phone","is",null).order("id"),
+      ]);
+      if(customers.error || contacts.error) return NextResponse.json({error:"LOOKUP_FAILED"},{status:400});
       for(const row of rows) row.customer_name=customers.data?.find(c=>c.id===row.customer_id)?.name;
+      for(const row of rows) {
+        const contact=contacts.data?.find(c=>c.customer_id===row.customer_id);
+        (row as Record<string,unknown>).contact_phone=contact?.phone ?? null;
+        (row as Record<string,unknown>).contact_name=contact?.name ?? null;
+      }
     }
     return NextResponse.json(result.data, {
       headers: { "Cache-Control": "private, no-store" },
@@ -337,7 +346,7 @@ export async function GET(req: NextRequest) {
     data.payments=[...new Map([...(section==="finance"?payments:[]),...parentPayments,...reversals].map(p=>[p.id,p])).values()];
   }
   if (section !== "map") {
-    const customerIds=[...new Set([...(data.deals as {customer_id:string}[]??[]),...(data.deal_cards as {customer_id:string}[]??[]),...(data.service_contracts as {customer_id:string}[]??[]),...(data.financial_documents as {customer_id:string}[]??[]),...(data.payments as {customer_id:string}[]??[])].map(r=>r.customer_id).filter(Boolean))];
+    const customerIds=[...new Set([...(data.deals as {customer_id:string}[]??[]),...(data.deal_cards as {customer_id:string}[]??[]),...(data.service_contracts as {customer_id:string}[]??[]),...(data.financial_documents as {customer_id:string}[]??[]),...(data.payments as {customer_id:string}[]??[]),...(data.sales_calls as {customer_id:string}[]??[])].map(r=>r.customer_id).filter(Boolean))];
     if(customerIds.length){
       const lookup=await db.from("customers").select("*").eq("organization_id",org).in("id",customerIds);
       if(lookup.error) return NextResponse.json({error:"LOOKUP_FAILED"},{status:400});

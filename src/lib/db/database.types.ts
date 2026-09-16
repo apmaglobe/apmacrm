@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -321,6 +326,7 @@ export type Database = {
       }
       conversations: {
         Row: {
+          archived: boolean
           created_at: string
           created_by: string
           id: string
@@ -329,6 +335,7 @@ export type Database = {
           version: number
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           created_by: string
           id?: string
@@ -337,6 +344,7 @@ export type Database = {
           version?: number
         }
         Update: {
+          archived?: boolean
           created_at?: string
           created_by?: string
           id?: string
@@ -365,6 +373,7 @@ export type Database = {
         Row: {
           address: string | null
           archived: boolean
+          created_by: string | null
           customer_id: string
           external_id: string
           id: string
@@ -378,6 +387,7 @@ export type Database = {
         Insert: {
           address?: string | null
           archived?: boolean
+          created_by?: string | null
           customer_id: string
           external_id: string
           id?: string
@@ -391,6 +401,7 @@ export type Database = {
         Update: {
           address?: string | null
           archived?: boolean
+          created_by?: string | null
           customer_id?: string
           external_id?: string
           id?: string
@@ -402,6 +413,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "customer_locations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customer_locations_organization_id_customer_id_fkey"
             columns: ["organization_id", "customer_id"]
@@ -416,6 +434,7 @@ export type Database = {
           archived: boolean
           category: string | null
           created_at: string
+          created_by: string | null
           external_id: string
           id: string
           name: string
@@ -427,6 +446,7 @@ export type Database = {
           archived?: boolean
           category?: string | null
           created_at?: string
+          created_by?: string | null
           external_id: string
           id?: string
           name: string
@@ -438,6 +458,7 @@ export type Database = {
           archived?: boolean
           category?: string | null
           created_at?: string
+          created_by?: string | null
           external_id?: string
           id?: string
           name?: string
@@ -446,6 +467,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "customers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customers_organization_id_fkey"
             columns: ["organization_id"]
@@ -990,6 +1018,141 @@ export type Database = {
           },
         ]
       }
+      internal_task_assignments: {
+        Row: {
+          assigned_at: string
+          member_id: string
+          organization_id: string
+          task_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          member_id: string
+          organization_id: string
+          task_id: string
+        }
+        Update: {
+          assigned_at?: string
+          member_id?: string
+          organization_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_task_assignments_organization_id_member_id_fkey"
+            columns: ["organization_id", "member_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "internal_task_assignments_organization_id_task_id_fkey"
+            columns: ["organization_id", "task_id"]
+            isOneToOne: false
+            referencedRelation: "internal_tasks"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      internal_task_updates: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          organization_id: string
+          task_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          task_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_task_updates_organization_id_author_id_fkey"
+            columns: ["organization_id", "author_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "internal_task_updates_organization_id_task_id_fkey"
+            columns: ["organization_id", "task_id"]
+            isOneToOne: false
+            referencedRelation: "internal_tasks"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      internal_tasks: {
+        Row: {
+          archived: boolean
+          created_at: string
+          created_by: string
+          description: string | null
+          due_at: string | null
+          id: string
+          organization_id: string
+          status: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          archived?: boolean
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          organization_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          archived?: boolean
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_tasks_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "internal_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -1125,6 +1288,177 @@ export type Database = {
           },
         ]
       }
+      marketing_plan_items: {
+        Row: {
+          archived: boolean
+          assignee_id: string
+          category: string
+          completed_count: number
+          created_at: string
+          created_by: string
+          department_id: string
+          due_at: string | null
+          id: string
+          organization_id: string
+          plan_id: string
+          planned_count: number
+          status: string
+          title: string
+          updated_at: string
+          version: number
+          work_id: string | null
+        }
+        Insert: {
+          archived?: boolean
+          assignee_id: string
+          category: string
+          completed_count?: number
+          created_at?: string
+          created_by: string
+          department_id: string
+          due_at?: string | null
+          id?: string
+          organization_id: string
+          plan_id: string
+          planned_count?: number
+          status?: string
+          title: string
+          updated_at?: string
+          version?: number
+          work_id?: string | null
+        }
+        Update: {
+          archived?: boolean
+          assignee_id?: string
+          category?: string
+          completed_count?: number
+          created_at?: string
+          created_by?: string
+          department_id?: string
+          due_at?: string | null
+          id?: string
+          organization_id?: string
+          plan_id?: string
+          planned_count?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: number
+          work_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_plan_items_organization_id_assignee_id_fkey"
+            columns: ["organization_id", "assignee_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plan_items_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plan_items_organization_id_department_id_fkey"
+            columns: ["organization_id", "department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plan_items_organization_id_plan_id_fkey"
+            columns: ["organization_id", "plan_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_plans"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plan_items_organization_id_work_id_fkey"
+            columns: ["organization_id", "work_id"]
+            isOneToOne: true
+            referencedRelation: "work_items"
+            referencedColumns: ["organization_id", "id"]
+          },
+        ]
+      }
+      marketing_plans: {
+        Row: {
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          deal_id: string | null
+          id: string
+          organization_id: string
+          status: string
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          deal_id?: string | null
+          id?: string
+          organization_id: string
+          status?: string
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          deal_id?: string | null
+          id?: string
+          organization_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_plans_customer_fk"
+            columns: ["organization_id", "customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plans_organization_id_created_by_fkey"
+            columns: ["organization_id", "created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plans_organization_id_deal_id_fkey"
+            columns: ["organization_id", "deal_id"]
+            isOneToOne: false
+            referencedRelation: "deal_cards"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plans_organization_id_deal_id_fkey"
+            columns: ["organization_id", "deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "marketing_plans_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meeting_participants: {
         Row: {
           meeting_id: string
@@ -1161,6 +1495,7 @@ export type Database = {
       meetings: {
         Row: {
           agenda: string | null
+          archived: boolean
           cancelled: boolean
           created_by: string
           customer_id: string | null
@@ -1178,6 +1513,7 @@ export type Database = {
         }
         Insert: {
           agenda?: string | null
+          archived?: boolean
           cancelled?: boolean
           created_by: string
           customer_id?: string | null
@@ -1195,6 +1531,7 @@ export type Database = {
         }
         Update: {
           agenda?: string | null
+          archived?: boolean
           cancelled?: boolean
           created_by?: string
           customer_id?: string | null
@@ -1773,6 +2110,78 @@ export type Database = {
           },
         ]
       }
+      sales_calls: {
+        Row: {
+          caller_id: string
+          created_at: string
+          customer_id: string
+          deal_id: string
+          id: string
+          note: string | null
+          organization_id: string
+          outcome: string
+          phone: string | null
+        }
+        Insert: {
+          caller_id: string
+          created_at?: string
+          customer_id: string
+          deal_id: string
+          id?: string
+          note?: string | null
+          organization_id: string
+          outcome: string
+          phone?: string | null
+        }
+        Update: {
+          caller_id?: string
+          created_at?: string
+          customer_id?: string
+          deal_id?: string
+          id?: string
+          note?: string | null
+          organization_id?: string
+          outcome?: string
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_calls_organization_id_caller_id_fkey"
+            columns: ["organization_id", "caller_id"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_calls_organization_id_customer_id_fkey"
+            columns: ["organization_id", "customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_calls_organization_id_deal_id_fkey"
+            columns: ["organization_id", "deal_id"]
+            isOneToOne: false
+            referencedRelation: "deal_cards"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_calls_organization_id_deal_id_fkey"
+            columns: ["organization_id", "deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "sales_calls_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_catalog: {
         Row: {
           archived: boolean
@@ -1816,9 +2225,11 @@ export type Database = {
       }
       service_contracts: {
         Row: {
+          archived: boolean
           billing_day: number
           category: string
           created_at: string
+          created_by: string | null
           customer_id: string
           end_date: string | null
           first_payment_date: string
@@ -1833,9 +2244,11 @@ export type Database = {
           version: number
         }
         Insert: {
+          archived?: boolean
           billing_day: number
           category?: string
           created_at?: string
+          created_by?: string | null
           customer_id: string
           end_date?: string | null
           first_payment_date: string
@@ -1850,9 +2263,11 @@ export type Database = {
           version?: number
         }
         Update: {
+          archived?: boolean
           billing_day?: number
           category?: string
           created_at?: string
+          created_by?: string | null
           customer_id?: string
           end_date?: string | null
           first_payment_date?: string
@@ -1867,6 +2282,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "service_contracts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "service_contracts_organization_id_customer_id_fkey"
             columns: ["organization_id", "customer_id"]
@@ -1984,7 +2406,9 @@ export type Database = {
       }
       tools: {
         Row: {
+          archived: boolean
           capacity: number
+          created_by: string | null
           id: string
           kind: string
           name: string
@@ -1993,7 +2417,9 @@ export type Database = {
           version: number
         }
         Insert: {
+          archived?: boolean
           capacity: number
+          created_by?: string | null
           id?: string
           kind: string
           name: string
@@ -2002,7 +2428,9 @@ export type Database = {
           version?: number
         }
         Update: {
+          archived?: boolean
           capacity?: number
+          created_by?: string | null
           id?: string
           kind?: string
           name?: string
@@ -2011,6 +2439,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "tools_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "memberships"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tools_organization_id_fkey"
             columns: ["organization_id"]
@@ -2151,6 +2586,7 @@ export type Database = {
           ends_at: string | null
           id: string
           kind: string
+          marketing_item_id: string | null
           name: string
           organization_id: string
           parent_service_id: string | null
@@ -2173,6 +2609,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           kind?: string
+          marketing_item_id?: string | null
           name: string
           organization_id: string
           parent_service_id?: string | null
@@ -2195,6 +2632,7 @@ export type Database = {
           ends_at?: string | null
           id?: string
           kind?: string
+          marketing_item_id?: string | null
           name?: string
           organization_id?: string
           parent_service_id?: string | null
@@ -2204,6 +2642,13 @@ export type Database = {
           version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "work_items_marketing_item_fk"
+            columns: ["organization_id", "marketing_item_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_plan_items"
+            referencedColumns: ["organization_id", "id"]
+          },
           {
             foreignKeyName: "work_items_organization_id_assignee_id_fkey"
             columns: ["organization_id", "assignee_id"]
@@ -2550,8 +2995,28 @@ export type Database = {
         Args: { display_name: string; join_token: string }
         Returns: string
       }
+      lifecycle_command: {
+        Args: {
+          expected_version: number
+          operation: string
+          org: string
+          payload: Json
+          request_id: string
+        }
+        Returns: Json
+      }
       login_context: { Args: never; Returns: Json }
       map_command: {
+        Args: {
+          expected_version: number
+          operation: string
+          org: string
+          payload: Json
+          request_id: string
+        }
+        Returns: Json
+      }
+      marketing_command: {
         Args: {
           expected_version: number
           operation: string
@@ -2593,6 +3058,16 @@ export type Database = {
         }
         Returns: Json
       }
+      tasks_command: {
+        Args: {
+          expected_version: number
+          operation: string
+          org: string
+          payload: Json
+          request_id: string
+        }
+        Returns: Json
+      }
       todo_items: {
         Args: {
           org: string
@@ -2614,6 +3089,7 @@ export type Database = {
           ends_at: string | null
           id: string
           kind: string
+          marketing_item_id: string | null
           name: string
           organization_id: string
           parent_service_id: string | null
@@ -2649,12 +3125,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2678,11 +3154,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2703,11 +3179,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2728,11 +3204,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2745,11 +3221,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -2766,4 +3242,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

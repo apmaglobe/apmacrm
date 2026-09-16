@@ -14,6 +14,7 @@ import { Users } from "@/modules/users/panel";
 import { Subscriptions } from "@/modules/subscriptions/panel";
 import { Tasks } from "@/modules/tasks/panel";
 import { Marketing } from "@/modules/marketing/panel";
+import { Calls } from "@/modules/calls/panel";
 export type PanelProps = {
   org: string;
   data: WorkspaceData;
@@ -88,6 +89,8 @@ export function ModulePage({ module, org, adminMode = false }: { module: string;
         <AdminPanel {...props} />
       ) : module === "crm" ? (
         <CRM {...props} />
+      ) : module === "calls" ? (
+        <Calls {...props} />
       ) : module === "map" ? (
         <Customers {...props} />
       ) : module === "finance" ? (
