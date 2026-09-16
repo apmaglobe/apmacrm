@@ -99,7 +99,10 @@ export async function GET(req: NextRequest) {
       db.from("memberships").select("*").eq("organization_id",org),
       db.from("departments").select("*").eq("organization_id",org),
     ]);
-    if(itemResult.error||dealsResult.error||membersResult.error||departmentsResult.error)return NextResponse.json({error:"MARKETING_DETAILS_FAILED"},{status:400});
+    if(itemResult.error||dealsResult.error||membersResult.error||departmentsResult.error) {
+      console.error("MARKETING_DETAILS_FAILED", {plans:planResult.error?.message, items:itemResult.error?.message, deals:dealsResult.error?.message, members:membersResult.error?.message, departments:departmentsResult.error?.message});
+      return NextResponse.json({error:"MARKETING_DETAILS_FAILED"},{status:400});
+    }
     return NextResponse.json({data:{marketing_plans:planResult.data,marketing_plan_items:itemResult.data,deals:dealsResult.data,memberships:membersResult.data,departments:departmentsResult.data},member,hasMore:false},{headers:{"Cache-Control":"private, no-store"}});
   }
   if (section === "map" && req.nextUrl.searchParams.get("all_locations") === "1") {
