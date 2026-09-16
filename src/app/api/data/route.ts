@@ -93,17 +93,19 @@ export async function GET(req: NextRequest) {
     if(planResult.error)return NextResponse.json({error:"MARKETING_PLANS_FAILED"},{status:400});
     const ids=planResult.data.map((plan:{id:string})=>plan.id);
     const dealIds=[...new Set(planResult.data.map((plan:{deal_id:string|null})=>plan.deal_id).filter((id:string|null):id is string=>!!id))];
-    const [itemResult,dealsResult,membersResult,departmentsResult]=await Promise.all([
+    const customerIds=[...new Set(planResult.data.map((plan:{customer_id:string|null})=>plan.customer_id).filter((id:string|null):id is string=>!!id))];
+    const [itemResult,dealsResult,membersResult,departmentsResult,customersResult]=await Promise.all([
       ids.length?(db as any).from("marketing_plan_items").select("*").eq("organization_id",org).in("plan_id",ids).eq("archived",false).order("due_at",{ascending:true,nullsFirst:false}):{data:[],error:null},
       dealIds.length?(db as any).from("deals").select("*").eq("organization_id",org).in("id",dealIds):{data:[],error:null},
       db.from("memberships").select("*").eq("organization_id",org),
       db.from("departments").select("*").eq("organization_id",org),
+      customerIds.length?db.from("customers").select("*").eq("organization_id",org).in("id",customerIds):{data:[],error:null},
     ]);
-    if(itemResult.error||dealsResult.error||membersResult.error||departmentsResult.error) {
-      console.error("MARKETING_DETAILS_FAILED", {plans:planResult.error?.message, items:itemResult.error?.message, deals:dealsResult.error?.message, members:membersResult.error?.message, departments:departmentsResult.error?.message});
+    if(itemResult.error||dealsResult.error||membersResult.error||departmentsResult.error||customersResult.error) {
+      console.error("MARKETING_DETAILS_FAILED", {plans:planResult.error?.message, items:itemResult.error?.message, deals:dealsResult.error?.message, members:membersResult.error?.message, departments:departmentsResult.error?.message, customers:customersResult.error?.message});
       return NextResponse.json({error:"MARKETING_DETAILS_FAILED"},{status:400});
     }
-    return NextResponse.json({data:{marketing_plans:planResult.data,marketing_plan_items:itemResult.data,deals:dealsResult.data,memberships:membersResult.data,departments:departmentsResult.data},member,hasMore:false},{headers:{"Cache-Control":"private, no-store"}});
+    return NextResponse.json({data:{marketing_plans:planResult.data,marketing_plan_items:itemResult.data,deals:dealsResult.data,memberships:membersResult.data,departments:departmentsResult.data,customers:customersResult.data},member,hasMore:false},{headers:{"Cache-Control":"private, no-store"}});
   }
   if (section === "map" && req.nextUrl.searchParams.get("all_locations") === "1") {
     const customers = await db
