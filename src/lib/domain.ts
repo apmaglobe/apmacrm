@@ -97,6 +97,7 @@ export const errorLabels: Record<string, string> = {
   TASK_ACCESS_DENIED: "Bu taska girişiniz yoxdur.",
   MARKETING_PLAN_DENIED: "Marketing planı üçün girişiniz yoxdur.",
   MARKETING_ITEM_DENIED: "Bu marketing elementini dəyişmək hüququnuz yoxdur.",
+  MARKETING_PLAN_ATTACH_REQUIRED: "Əvvəl marketing planı təsdiqlənmiş CRM qutusuna bağlayın.",
   TASK_ASSIGNEE_REQUIRED: "Ən azı bir cavabdeh seçin.",
   TASK_TITLE_REQUIRED: "Taskın adını yazın.",
   TASK_UPDATE_REQUIRED: "Görülən iş qeydini yazın.",
