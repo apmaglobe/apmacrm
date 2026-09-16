@@ -12,6 +12,7 @@ export const modules = [
   ["users", "Userlər"],
   ["todo", "To Do"],
   ["tasks", "Tasklar"],
+  ["marketing", "Marketing plan"],
 ] as const;
 export const salesStages = [
   ["to_call", "Zəng ediləcək"],
@@ -94,6 +95,8 @@ export const errorLabels: Record<string, string> = {
   TASK_WRITE_REQUIRED: "Daxili task yaratmaq səlahiyyətiniz yoxdur.",
   TASK_MANAGER_REQUIRED: "Bu taskı dəyişmək və ya silmək səlahiyyətiniz yoxdur.",
   TASK_ACCESS_DENIED: "Bu taska girişiniz yoxdur.",
+  MARKETING_PLAN_DENIED: "Marketing planı üçün girişiniz yoxdur.",
+  MARKETING_ITEM_DENIED: "Bu marketing elementini dəyişmək hüququnuz yoxdur.",
   TASK_ASSIGNEE_REQUIRED: "Ən azı bir cavabdeh seçin.",
   TASK_TITLE_REQUIRED: "Taskın adını yazın.",
   TASK_UPDATE_REQUIRED: "Görülən iş qeydini yazın.",

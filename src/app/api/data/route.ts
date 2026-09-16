@@ -5,6 +5,7 @@ const tables: Record<string, string[]> = {
   crm: ["pipeline_stages"],
   todo: ["work_items", "deal_cards"],
   tasks: ["internal_tasks", "internal_task_assignments", "internal_task_updates"],
+  marketing: ["marketing_plans", "marketing_plan_items", "deals"],
   map: ["customers", "customer_locations", "contacts", "import_jobs"],
   tools: ["tools", "tool_units", "tool_reservations"],
   finance: [
@@ -84,6 +85,22 @@ export async function GET(req: NextRequest) {
       member,
       hasMore: taskResult.data.length === 200,
     }, { headers: { "Cache-Control": "private, no-store" } });
+  }
+  if (section === "marketing") {
+    let plans = (db as any).from("marketing_plans").select("*").eq("organization_id", org).neq("status", "archived").order("updated_at", {ascending:false});
+    if (q) plans=plans.ilike("title", "%"+q.replace(/[%_]/g, "")+"%");
+    const planResult=await plans;
+    if(planResult.error)return NextResponse.json({error:"MARKETING_PLANS_FAILED"},{status:400});
+    const ids=planResult.data.map((plan:{id:string})=>plan.id);
+    const dealIds=[...new Set(planResult.data.map((plan:{deal_id:string})=>plan.deal_id))];
+    const [itemResult,dealsResult,membersResult,departmentsResult]=await Promise.all([
+      ids.length?(db as any).from("marketing_plan_items").select("*").eq("organization_id",org).in("plan_id",ids).eq("archived",false).order("due_at",{ascending:true,nullsFirst:false}):{data:[],error:null},
+      dealIds.length?(db as any).from("deals").select("*").eq("organization_id",org).in("id",dealIds):{data:[],error:null},
+      db.from("memberships").select("*").eq("organization_id",org),
+      db.from("departments").select("*").eq("organization_id",org),
+    ]);
+    if(itemResult.error||dealsResult.error||membersResult.error||departmentsResult.error)return NextResponse.json({error:"MARKETING_DETAILS_FAILED"},{status:400});
+    return NextResponse.json({data:{marketing_plans:planResult.data,marketing_plan_items:itemResult.data,deals:dealsResult.data,memberships:membersResult.data,departments:departmentsResult.data},member,hasMore:false},{headers:{"Cache-Control":"private, no-store"}});
   }
   if (section === "map" && req.nextUrl.searchParams.get("all_locations") === "1") {
     const customers = await db

@@ -4,7 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import {Download} from "lucide-react";
 import {Modal} from "./dialog";
 import {command} from "@/lib/db/api";
-const supported=["crm","map","todo","tasks","finance","subscriptions","tools","meetings","portfolio","drive","users"];
+const supported=["crm","map","todo","tasks","marketing","finance","subscriptions","tools","meetings","portfolio","drive","users"];
 type Job={id:string;module:string;format:string;status:string;last_error:string|null};
 export function Export({org,module,q,filters={}}:{org:string;module:string;q:string;filters?:Record<string,string>}){
  const [open,setOpen]=useState(false),[format,setFormat]=useState("xlsx"),[error,setError]=useState(""),[busy,setBusy]=useState(false);

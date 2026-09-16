@@ -30,6 +30,9 @@ export type Item = {
   };
   service_days: number;
   periods: { id: string; deal_id: string; start: string; end: string }[];
+  plan_id: string;
+  planned_count: number;
+  completed_count: number;
   id: string;
   organization_id: string;
   name: string;

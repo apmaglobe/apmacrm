@@ -16,6 +16,7 @@ const input = z.object({
     "map",
     "tasks",
     "lifecycle",
+    "marketing",
   ]),
   operation: z.string().max(60),
   payload: z.record(z.string(), z.unknown()),
