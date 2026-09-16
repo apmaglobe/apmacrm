@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
     const planResult=await plans;
     if(planResult.error)return NextResponse.json({error:"MARKETING_PLANS_FAILED"},{status:400});
     const ids=planResult.data.map((plan:{id:string})=>plan.id);
-    const dealIds=[...new Set(planResult.data.map((plan:{deal_id:string})=>plan.deal_id))];
+    const dealIds=[...new Set(planResult.data.map((plan:{deal_id:string|null})=>plan.deal_id).filter((id:string|null):id is string=>!!id))];
     const [itemResult,dealsResult,membersResult,departmentsResult]=await Promise.all([
       ids.length?(db as any).from("marketing_plan_items").select("*").eq("organization_id",org).in("plan_id",ids).eq("archived",false).order("due_at",{ascending:true,nullsFirst:false}):{data:[],error:null},
       dealIds.length?(db as any).from("deals").select("*").eq("organization_id",org).in("id",dealIds):{data:[],error:null},
