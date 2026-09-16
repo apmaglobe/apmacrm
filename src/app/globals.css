@@ -1608,3 +1608,11 @@ table select {
   .brand-logo img { width: 128px; }
   .topbar { padding: 0 18px; gap: 12px; }
 }
+.brand > .brand-logo {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  letter-spacing: normal;
+}
