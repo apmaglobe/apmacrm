@@ -24,11 +24,9 @@ export async function POST(req: NextRequest) {
     .eq("organization_id", org)
     .eq("user_id", user.id)
     .single();
-  const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
   if (
     !member?.is_admin ||
     member.status !== "active" ||
-    aal.data?.currentLevel !== "aal2" ||
     !path.startsWith(`${org}/imports/${user.id}/`)
   )
     return NextResponse.json({ error: "ADMIN_REQUIRED" }, { status: 403 });

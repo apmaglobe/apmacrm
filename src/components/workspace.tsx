@@ -8,7 +8,7 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck } from "lucide-react";
+import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck, Users } from "lucide-react";
 import { browserClient } from "@/lib/auth/browser";
 import { modules } from "@/lib/domain";
 import { BrandLogo } from "@/components/brand-logo";
@@ -19,12 +19,14 @@ const serverReady = () => false;
 export function Workspace({
   children,
   organizations,
+  members,
   org,
   userId,
   isAdmin = false,
 }: {
   children: React.ReactNode;
   organizations: { id: string; name: string; logo_path?:string|null }[];
+  members: { id: string; user_id: string; name: string }[];
   org: string;
   userId: string;
   isAdmin?: boolean;
@@ -39,7 +41,7 @@ export function Workspace({
   );
   return (
     <QueryClientProvider client={client}>
-      <Frame org={org} organizations={organizations} userId={userId} isAdmin={isAdmin}>
+      <Frame org={org} organizations={organizations} members={members} userId={userId} isAdmin={isAdmin}>
         {children}
       </Frame>
     </QueryClientProvider>
@@ -48,12 +50,14 @@ export function Workspace({
 function Frame({
   children,
   organizations,
+  members,
   org,
   userId,
   isAdmin = false,
 }: {
   children: React.ReactNode;
   organizations: { id: string; name: string; logo_path?:string|null }[];
+  members: { id: string; user_id: string; name: string }[];
   org: string;
   userId: string;
   isAdmin?: boolean;
@@ -64,7 +68,10 @@ function Frame({
     router = useRouter(),
     cache = useQueryClient();
   const [open, setOpen] = useState(false),
-    [live, setLive] = useState(false);
+    [live, setLive] = useState(false),
+    [onlineOpen, setOnlineOpen] = useState(false),
+    [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
+  const onlineMembers = members.filter((member) => onlineUserIds.includes(member.user_id));
   useEffect(() => {
     const db = browserClient();
     const channel = db
@@ -82,6 +89,15 @@ function Frame({
           cache.invalidateQueries();
         }
       });
+    const presence = db
+      .channel(`presence:${org}`, { config: { private: true, presence: { key: userId } } })
+      .on("presence", { event: "sync" }, () => {
+        setOnlineUserIds(Object.keys(presence.presenceState()));
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") void presence.track({ active_at: new Date().toISOString() });
+        if (status === "CLOSED" || status === "CHANNEL_ERROR" || status === "TIMED_OUT") setOnlineUserIds([]);
+      });
     const { data } = db.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         cache.clear();
@@ -90,6 +106,7 @@ function Frame({
     });
     return () => {
       db.removeChannel(channel);
+      db.removeChannel(presence);
       data.subscription.unsubscribe();
       cache.clear();
     };
@@ -114,6 +131,23 @@ function Frame({
             <span className="connection-dot" aria-hidden="true" />
             {live ? "Canlı" : "Bağlanır…"}
           </span>
+          <div className="online-presence-wrap">
+            <button
+              className="online-presence"
+              type="button"
+              onClick={() => setOnlineOpen((value) => !value)}
+              aria-expanded={onlineOpen}
+              aria-label={`Hazırda ${onlineMembers.length} əməkdaş onlayndır`}
+            >
+              <span className="online-dot" aria-hidden="true" />
+              <Users size={16} />
+              <span>{onlineMembers.length} onlayn</span>
+            </button>
+            {onlineOpen && <div className="online-popover" role="status">
+              <strong>Hazırda onlayn</strong>
+              {onlineMembers.length ? <ul>{onlineMembers.map((member) => <li key={member.id}><span className="avatar">{member.name.slice(0, 1).toUpperCase()}</span>{member.name}</li>)}</ul> : <p>Hazırda onlayn əməkdaş yoxdur.</p>}
+            </div>}
+          </div>
           <Link
             className="icon-button"
             href="/workspace/inbox"

@@ -58,8 +58,7 @@ export async function GET(req: NextRequest) {
     .eq("user_id", user.id)
     .eq("status", "active")
     .single();
-  const aal = await db.auth.mfa.getAuthenticatorAssuranceLevel();
-  if (!member || (member.is_admin && aal.data?.currentLevel !== "aal2"))
+  if (!member)
     return NextResponse.json({ error: "ACCESS_DENIED" }, { status: 403 });
   if (section === "tasks") {
     const offset = Number(req.nextUrl.searchParams.get("offset") ?? 0);
