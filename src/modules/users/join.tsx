@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { browserClient } from "@/lib/auth/browser";
 import { Form, Field } from "@/components/form";
+import { BrandLogo } from "@/components/brand-logo";
 export function JoinForm({
   token,
   invitation = false,
@@ -14,9 +15,7 @@ export function JoinForm({
   return (
     <main className="auth">
       <div className="auth-card">
-        <div className="brand">
-          APMA<span>CRM</span>
-        </div>
+        <div className="brand"><BrandLogo /></div>
         <h1>Agentliyə qoşulun</h1>
         {done ? (
           <p className="notice">

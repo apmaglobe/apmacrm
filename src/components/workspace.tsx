@@ -1,7 +1,6 @@
 "use client";
 import {useTheme} from "./theme";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
@@ -12,6 +11,7 @@ import {
 import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck } from "lucide-react";
 import { browserClient } from "@/lib/auth/browser";
 import { modules } from "@/lib/domain";
+import { BrandLogo } from "@/components/brand-logo";
 const subscribeReady = () => () => {};
 const clientReady = () => true;
 const serverReady = () => false;
@@ -98,7 +98,7 @@ function Frame({
     <div className={dark ? "app dark" : "app"}>
       <header className="topbar">
         <Link href="/workspace/crm" className="brand">
-          {organizations.find(x=>x.id===org)?.logo_path?<Image unoptimized src={`/api/media?org=${org}`} width={100} height={36} alt={organizations.find(x=>x.id===org)?.name??"APMA CRM"}/>:<>APMA<span>CRM</span></>}
+          <BrandLogo />
         </Link>
         <button className="org-switch" onClick={() => setOpen(!open)}>
           {organizations.find((x) => x.id === org)?.name}

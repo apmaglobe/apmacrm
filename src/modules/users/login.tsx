@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { BrandLogo } from "@/components/brand-logo";
 import { browserClient } from "@/lib/auth/browser";
 type LoginContext = {has_active_membership:boolean;requires_mfa:boolean;bootstrap_pending:boolean};
 type Mode = "loading" | "login" | "register" | "reset" | "password" | "mfa" | "setup" | "activate" | "account" | "pending";
@@ -140,7 +141,7 @@ export function Login() {
   const titles:Record<Mode,string>={loading:"Hesab yoxlanır…",login:"Xoş gəlmisiniz",register:"Hesab yaradın",reset:"Şifrəni bərpa edin",password:"Yeni şifrə",mfa:"İki mərhələli təsdiq",setup:"Admin hesabını qoruyun",activate:"Admin hesabınız hazırdır",account:"Girişiniz təsdiqlənib",pending:"Üzvlük təsdiqi gözlənilir"};
   const showForm=["login","register","reset","password","mfa"].includes(mode);
   return <main className="auth"><div className="auth-card">
-    <div className="brand">APMA<span>CRM</span></div>
+    <div className="brand"><BrandLogo /></div>
     <p className="eyebrow">AGENTLİYİN İŞ SAHƏSİ</p><h1>{titles[mode]}</h1>
     {signed&&<p className="helper">{email}</p>}
     {mode==="loading"&&<p role="status">Giriş vəziyyəti yoxlanır…</p>}

@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   applicationName: "APMA CRM",
   appleWebApp: { capable: true, title: "APMA CRM", statusBarStyle: "black" },
   formatDetection: { telephone: false },
+  icons: {
+    icon: { url: "/brand/apma-icon-light-192.png", type: "image/png", sizes: "192x192" },
+    apple: { url: "/brand/apma-icon-light-192.png", type: "image/png", sizes: "192x192" },
+  },
 };
 export default function RootLayout({
   children,
