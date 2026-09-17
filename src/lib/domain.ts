@@ -15,6 +15,13 @@ export const modules = [
   ["tasks", "Tasklar"],
   ["marketing", "Marketing plan"],
 ] as const;
+export const navGroups = [
+  ["Overview", ["overview"]],
+  ["CRM", ["crm", "calls", "map", "todo"]],
+  ["İş", ["tasks", "tools", "meetings", "marketing"]],
+  ["Maliyyə", ["finance", "subscriptions", "portfolio"]],
+  ["Komanda", ["users", "inbox", "drive"]],
+] as const;
 export const salesStages = [
   ["to_call", "Zəng ediləcək"],
   ["called", "Zəng edilib"],
