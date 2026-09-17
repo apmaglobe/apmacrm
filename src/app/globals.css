@@ -1736,11 +1736,8 @@ button:not(:disabled):active,
   justify-content: center;
   min-height: 64px;
   padding: 8px clamp(14px, 2.5vw, 42px);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
+  flex-wrap: wrap;
 }
-.main-nav::-webkit-scrollbar { display: none; }
 .main-nav > a {
   min-height: 42px;
   padding: 11px 12px;
