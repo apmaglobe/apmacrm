@@ -4,7 +4,7 @@
 
 Paket v1.0 üçün yekundur. Bu repo hələ planlaşdırma mərhələsindədir; tətbiqi yalnız istifadəçi qurulma tapşırığı verəndə implementasiya et. Bu fayl təkbaşına qurulma əmri deyil.
 
-Əvvəl README.md və docs/06-suallar-ve-qerarlar.md, sonra cari mərhələnin sənədlərini oxu. D01–D56 birbaşa istifadəçi qərarıdır. Son göstəriş D57 ilə qalan seçimləri assistentə həvalə edib; S01–S33 docs/07-yekun-suallar-ve-cavablar.md-də v1 üçün seçilib. Onları yenidən istifadəçidən təsdiqlətmə. Yeni göstəriş üstün sayılır; böyük biznes ziddiyyəti yaranarsa konkretləşdir, adi texniki seçimlərə görə müsahibəni yenidən başlatma.
+Əvvəl README.md və docs/06-suallar-ve-qerarlar.md, sonra cari mərhələnin sənədlərini oxu. Kodu tapmaq üçün əvvəlcə docs/file-map.md-ə bax (modul→fayl xəritəsi); grep/explore yalnız orada olmayan şeylər üçün. D01–D56 birbaşa istifadəçi qərarıdır. Son göstəriş D57 ilə qalan seçimləri assistentə həvalə edib; S01–S33 docs/07-yekun-suallar-ve-cavablar.md-də v1 üçün seçilib. Onları yenidən istifadəçidən təsdiqlətmə. Yeni göstəriş üstün sayılır; böyük biznes ziddiyyəti yaranarsa konkretləşdir, adi texniki seçimlərə görə müsahibəni yenidən başlatma.
 
 İstifadəçi ilə Azərbaycan dilində, sadə izahla danış. Lazım olan sualları 1, 2, 3 formatında qısa ver; hesab/fayl rekvizitlərini uydurma. Mövcud bağlı alət və repo konfiqurasiyasını əvvəl yoxla. Secretləri chat/repo/loga yazma.
 
