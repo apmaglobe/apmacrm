@@ -2,6 +2,7 @@
 
 import type { PanelProps } from "@/components/module-page";
 import { dateTime } from "@/lib/domain";
+import { CallScripts } from "@/components/call-scripts";
 
 export function Calls({ data, q }: PanelProps) {
   const calls = (data.sales_calls ?? []).filter((call) => {
@@ -16,6 +17,10 @@ export function Calls({ data, q }: PanelProps) {
     .map((member) => ({ member, calls: calls.filter((call) => call.caller_id === member.id) }))
     .sort((a, b) => b.calls.length - a.calls.length || String(a.member.name).localeCompare(String(b.member.name)));
   return <>
+    <section className="surface">
+      <div className="section-toolbar"><h2>Hazır mətinlər</h2></div>
+      <CallScripts />
+    </section>
     <section className="surface">
       <div className="section-toolbar"><div><h2>Zəng nəticələri</h2><p className="helper">“Zəng et” telefonun yığma tətbiqini açır və cəhdi dərhal tarixçəyə yazır.</p></div><strong className="count">{calls.length} qeyd</strong></div>
       <div className="call-stats">
