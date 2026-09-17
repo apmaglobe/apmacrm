@@ -6,6 +6,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   QueryClient,
   QueryClientProvider,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck, Users } from "lucide-react";
@@ -72,6 +73,35 @@ function Frame({
     [onlineOpen, setOnlineOpen] = useState(false),
     [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const onlineMembers = members.filter((member) => onlineUserIds.includes(member.user_id));
+  const memberId = members.find((member) => member.user_id === userId)?.id;
+  const unread = useQuery({
+    queryKey: ["workspace", org, "inbox-unread"],
+    enabled: !!memberId,
+    staleTime: 15000,
+    queryFn: async () => {
+      if (!memberId) return false;
+      const db = browserClient();
+      const memberships = await db
+        .from("conversation_members")
+        .select("conversation_id,read_at")
+        .eq("organization_id", org)
+        .eq("member_id", memberId)
+        .is("removed_at", null);
+      const ids = (memberships.data ?? []).map((row) => row.conversation_id);
+      if (!ids.length) return false;
+      const messages = await db
+        .from("messages")
+        .select("conversation_id,author_id,created_at")
+        .eq("organization_id", org)
+        .in("conversation_id", ids)
+        .order("created_at", { ascending: false })
+        .limit(300);
+      return (memberships.data ?? []).some((row) => {
+        const latest = messages.data?.find((message) => message.conversation_id === row.conversation_id);
+        return !!latest && latest.author_id !== memberId && (!row.read_at || new Date(latest.created_at) > new Date(row.read_at));
+      });
+    },
+  });
   useEffect(() => {
     const db = browserClient();
     const channel = db
@@ -185,6 +215,7 @@ function Frame({
             onClick={() => setOpen(!open)}
           >
             <Menu />
+            {unread.data && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
           </button>
         </div>
       </header>
@@ -202,6 +233,7 @@ function Frame({
             className={path.endsWith("/" + id) ? "active" : ""}
           >
             {label}
+            {id === "inbox" && unread.data && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
           </Link>
         ))}
         {open && organizations.length > 1 && (
