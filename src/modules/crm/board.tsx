@@ -1,5 +1,6 @@
 "use client";
 import { CustomerSelect } from "@/components/customer-select";
+import { CallScripts } from "@/components/call-scripts";
 import { PaymentActions } from "@/modules/finance/payment-actions";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -403,6 +404,10 @@ export function CRM(props: PanelProps) {
             {call.kind === "call" ? <>
               <Field name="phone" label="Telefon nömrəsi" value={String(call.deal.contact_phone ?? "")} required />
               <p className="helper">Saxlanandan sonra telefonunuzun yığma tətbiqi açılacaq. Qeydi zəngdən əvvəl və ya qısa nəticə kimi yaza bilərsiniz.</p>
+              <details className="call-scripts-details">
+                <summary>Hazır mətn (zəng üçün)</summary>
+                <CallScripts />
+              </details>
             </> : <p className="helper">Qutu dərhal Lost-a keçiriləcək və əməliyyatı edən şəxs zəng qeydinə yazılacaq.</p>}
             <label>Qısa qeyd (istəyə görə)<textarea name="note" maxLength={2000} /></label>
           </Form>
