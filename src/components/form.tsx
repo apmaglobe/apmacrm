@@ -17,11 +17,13 @@ export function Form({
       onSubmit={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const data = new FormData(e.currentTarget);
+        const formEl = e.currentTarget;
+        const data = new FormData(formEl);
         setBusy(true);
         setError("");
         try {
           await onSave(data);
+          formEl.reset();
         } catch (err) {
           setError(err instanceof Error ? err.message : "Saxlanmadı");
         } finally {

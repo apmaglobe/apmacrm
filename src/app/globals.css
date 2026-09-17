@@ -143,6 +143,7 @@ button > svg, .button > svg { flex-shrink: 0; vertical-align: middle; }
   position: relative;
 }
 .main-nav > a {
+  position: relative;
   color: var(--muted);
   font-weight: 550;
   text-decoration: none;
@@ -151,6 +152,18 @@ button > svg, .button > svg { flex-shrink: 0; vertical-align: middle; }
   border-radius: 7px;
   white-space: nowrap;
 }
+.nav-dot {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e5484d;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.mobile-toggle { position: relative; }
+.mobile-toggle .nav-dot { top: 4px; right: 4px; }
 .main-nav > a.active {
   background: var(--soft);
   color: var(--accent);
@@ -712,6 +725,24 @@ input[type="checkbox"] {
 .mapping-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+.assignee-picker { border: 1px solid #dce4e5; border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 9px; }
+.assignee-picker legend { font-size: 13px; font-weight: 550; padding: 0 4px; }
+.assignee-options { display: flex; flex-wrap: wrap; gap: 7px 14px; max-height: 190px; overflow-y: auto; }
+.assignee-option { flex-direction: row; align-items: center; gap: 7px; font-size: 13px; min-height: 30px; width: auto; }
+.assignee-option input { width: 17px; min-height: 17px; }
+.datetime-field { position: relative; display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 550; }
+.datetime-trigger { display: inline-flex; align-items: center; gap: 8px; justify-content: flex-start; font-weight: 500; }
+.datetime-popover { position: absolute; top: calc(100% + 6px); left: 0; z-index: 60; width: 270px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 16px 36px rgb(20 36 46 / 16%); }
+.datetime-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.datetime-nav button { min-height: 30px; padding: 4px 8px; }
+.datetime-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.datetime-grid strong { font-size: 10px; color: var(--muted); font-weight: 600; padding: 4px 0; }
+.datetime-grid button { min-height: 30px; padding: 0; border-radius: 6px; font-size: 12px; background: transparent; border: 0; }
+.datetime-grid button:hover { background: var(--bg); }
+.datetime-grid button.active { background: var(--accent); color: #fff; }
+.datetime-time { margin-top: 12px; flex-direction: row; align-items: center; justify-content: space-between; }
+.datetime-time input { width: auto; min-height: 36px; }
+.datetime-popover > .primary { margin-top: 12px; width: 100%; }
 fieldset {
   border: 1px solid var(--border);
   border-radius: 8px;
