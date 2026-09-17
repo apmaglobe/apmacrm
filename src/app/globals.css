@@ -172,6 +172,40 @@ button > svg, .button > svg { flex-shrink: 0; vertical-align: middle; }
   color: var(--accent);
   background: var(--bg);
 }
+.nav-group { position: relative; }
+.nav-group-trigger {
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 550;
+  font-size: inherit;
+  min-height: 44px;
+  padding: 13px 13px;
+  border-radius: 7px;
+  gap: 5px;
+  white-space: nowrap;
+}
+.nav-group-trigger:hover { color: var(--accent); background: var(--bg); }
+.nav-group-trigger.active { background: var(--soft); color: var(--accent); }
+.nav-group-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  min-width: 180px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 16px 36px rgb(20 36 46 / 16%);
+}
+.nav-group-menu a { padding: 10px 12px; border-radius: 7px; color: var(--text); text-decoration: none; }
+.nav-group-menu a:hover { background: var(--bg); }
+.nav-group-menu a.active { background: var(--soft); color: var(--accent); }
 .mobile-toggle {
   display: none;
 }
@@ -1356,6 +1390,22 @@ table select {
   .main-nav > a {
     font-size: 13px;
     text-align: center;
+  }
+  .nav-group {
+    grid-column: 1 / -1;
+  }
+  .nav-group-trigger {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 13px;
+  }
+  .nav-group-menu {
+    position: static;
+    margin-top: 2px;
+    padding: 4px 0 4px 14px;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
   }
   .workspace {
     padding: 22px 15px;

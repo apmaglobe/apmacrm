@@ -2,7 +2,7 @@
 import {useTheme} from "./theme";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   QueryClient,
   QueryClientProvider,
@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-query";
 import { Menu, Sun, Moon, LogOut, Bell, ChevronDown, ShieldCheck, Users } from "lucide-react";
 import { browserClient } from "@/lib/auth/browser";
-import { modules } from "@/lib/domain";
+import { modules, navGroups } from "@/lib/domain";
 import { BrandLogo } from "@/components/brand-logo";
 const subscribeReady = () => () => {};
 const clientReady = () => true;
@@ -71,7 +71,16 @@ function Frame({
   const [open, setOpen] = useState(false),
     [live, setLive] = useState(false),
     [onlineOpen, setOnlineOpen] = useState(false),
-    [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
+    [onlineUserIds, setOnlineUserIds] = useState<string[]>([]),
+    [openGroup, setOpenGroup] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setOpenGroup(null);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
   const onlineMembers = members.filter((member) => onlineUserIds.includes(member.user_id));
   const memberId = members.find((member) => member.user_id === userId)?.id;
   const unread = useQuery({
@@ -220,22 +229,60 @@ function Frame({
         </div>
       </header>
       <nav
+        ref={navRef}
         className={"main-nav " + (open ? "open" : "")}
         aria-label="Əsas menyu"
         id="workspace-navigation"
       >
         {isAdmin && <Link className="mobile-admin-entry" href={`/workspace/admin?org=${org}`} onClick={()=>setOpen(false)}>Admin panel</Link>}
-        {modules.map(([id, label]) => (
-          <Link
-            key={id}
-            href={"/workspace/" + id + "?org=" + org}
-            onClick={() => setOpen(false)}
-            className={path.endsWith("/" + id) ? "active" : ""}
-          >
-            {label}
-            {id === "inbox" && unread.data && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
-          </Link>
-        ))}
+        {navGroups.map(([groupLabel, ids]) => {
+          const items = modules.filter((m) => (ids as readonly string[]).includes(m[0]));
+          if (items.length === 1) {
+            const [id, label] = items[0];
+            return (
+              <Link
+                key={id}
+                href={"/workspace/" + id + "?org=" + org}
+                onClick={() => setOpen(false)}
+                className={path.endsWith("/" + id) ? "active" : ""}
+              >
+                {label}
+                {id === "inbox" && unread.data && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
+              </Link>
+            );
+          }
+          const groupActive = items.some(([id]) => path.endsWith("/" + id));
+          const groupUnread = items.some(([id]) => id === "inbox" && unread.data);
+          return (
+            <div className="nav-group" key={groupLabel}>
+              <button
+                type="button"
+                className={"nav-group-trigger " + (groupActive ? "active" : "")}
+                aria-expanded={openGroup === groupLabel}
+                onClick={() => setOpenGroup(openGroup === groupLabel ? null : groupLabel)}
+              >
+                {groupLabel}
+                <ChevronDown size={13} />
+                {groupUnread && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
+              </button>
+              {openGroup === groupLabel && (
+                <div className="nav-group-menu">
+                  {items.map(([id, label]) => (
+                    <Link
+                      key={id}
+                      href={"/workspace/" + id + "?org=" + org}
+                      onClick={() => { setOpen(false); setOpenGroup(null); }}
+                      className={path.endsWith("/" + id) ? "active" : ""}
+                    >
+                      {label}
+                      {id === "inbox" && unread.data && <span className="nav-dot" aria-label="Oxunmamış mesaj var" />}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
         {open && organizations.length > 1 && (
           <div className="tenant-options">
             {organizations.map((o) => (
