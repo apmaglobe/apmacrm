@@ -16,11 +16,11 @@ export const modules = [
   ["marketing", "Marketing plan"],
 ] as const;
 export const navGroups = [
-  ["Overview", ["overview"]],
-  ["CRM", ["crm", "calls", "map", "todo"]],
   ["İş", ["tasks", "tools", "meetings", "marketing"]],
-  ["Maliyyə", ["finance", "subscriptions", "portfolio"]],
+  ["CRM", ["crm", "calls", "map", "todo"]],
   ["Komanda", ["users", "inbox", "drive"]],
+  ["Overview", ["overview"]],
+  ["Maliyyə", ["finance", "subscriptions", "portfolio"]],
 ] as const;
 export const salesStages = [
   ["to_call", "Zəng ediləcək"],
