@@ -90,13 +90,20 @@ function Frame({
     queryFn: async () => {
       if (!memberId) return false;
       const db = browserClient();
-      const memberships = await db
-        .from("conversation_members")
-        .select("conversation_id,read_at")
-        .eq("organization_id", org)
-        .eq("member_id", memberId)
-        .is("removed_at", null);
-      const ids = (memberships.data ?? []).map((row) => row.conversation_id);
+      const [memberships, conversations] = await Promise.all([
+        db
+          .from("conversation_members")
+          .select("conversation_id,read_at")
+          .eq("organization_id", org)
+          .eq("member_id", memberId)
+          .is("removed_at", null),
+        db.from("conversations").select("id,archived").eq("organization_id", org),
+      ]);
+      const activeIds = new Set(
+        (conversations.data ?? []).filter((c) => !c.archived).map((c) => c.id),
+      );
+      const rows = (memberships.data ?? []).filter((row) => activeIds.has(row.conversation_id));
+      const ids = rows.map((row) => row.conversation_id);
       if (!ids.length) return false;
       const messages = await db
         .from("messages")
@@ -105,7 +112,7 @@ function Frame({
         .in("conversation_id", ids)
         .order("created_at", { ascending: false })
         .limit(300);
-      return (memberships.data ?? []).some((row) => {
+      return rows.some((row) => {
         const latest = messages.data?.find((message) => message.conversation_id === row.conversation_id);
         return !!latest && latest.author_id !== memberId && (!row.read_at || new Date(latest.created_at) > new Date(row.read_at));
       });
